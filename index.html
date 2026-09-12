@@ -1,0 +1,2872 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCSE 2 - TOS Aurora：SecureChange 技術手冊｜安數科技 SECDigit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-900:#1a1614;
+    --ink-800:#231F20;
+    --ink-700:#332b28;
+    --orange-600:#ED7600;
+    --orange-500:#F58B24;
+    --teal-600:#2F8B8C;
+    --bg:#f7f6f4;
+    --card:#ffffff;
+    --text:#231F20;
+    --text-soft:#5a544f;
+    --border:#e6e1da;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  html{font-size:15px;}
+  body{
+    margin:0;padding:0;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1.75;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  p, li, span, div, figcaption, a, button, h1, h2, h3 { font-size: inherit; }
+
+  /* ---------- Header ---------- */
+  header.site-header{
+    flex:0 0 auto;
+    background:linear-gradient(120deg,var(--ink-900),var(--ink-800) 65%,#3d332e);
+    color:#fff;
+    padding:10px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    box-shadow:0 2px 10px rgba(20,15,10,.3);
+    border-bottom:3px solid var(--orange-600);
+    z-index:60;
+  }
+  header.site-header .brand-left,header.site-header .brand-right{display:flex;align-items:center;gap:12px;flex:0 0 auto;}
+  header.site-header img.logo{height:38px;width:auto;display:block;}
+  header.site-header .brand-right img.logo{height:30px;}
+  header.site-header svg.tufin-logo{height:32px;width:auto;display:block;}
+  header.site-header .title-block{flex:1 1 auto;text-align:center;min-width:0;padding:0 10px;}
+  header.site-header .title-block h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header.site-header .title-block .sub{font-size:15px;color:#e7c9a3;margin-top:2px;}
+  .divider-line{width:1px;height:26px;background:rgba(255,255,255,.3);}
+
+  /* ---------- Tab bar (draggable/scrollable) ---------- */
+  nav.tab-bar-wrap{
+    flex:0 0 auto;
+    background:var(--ink-800);
+    display:flex;align-items:center;
+    padding:0 4px;
+    border-bottom:2px solid var(--orange-600);
+    z-index:55;
+  }
+  .tab-arrow{
+    flex:0 0 auto;background:var(--ink-700);color:#fff;border:none;
+    width:28px;height:32px;cursor:pointer;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:6px;margin:4px;user-select:none;
+  }
+  .tab-arrow:hover{background:var(--orange-600);}
+  .tab-scroll{
+    flex:1 1 auto;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scroll-behavior:smooth;
+    -ms-overflow-style:none;scrollbar-width:none;cursor:grab;padding:4px 2px;
+  }
+  .tab-scroll::-webkit-scrollbar{display:none;}
+  .tab-scroll.dragging{cursor:grabbing;}
+  .tab-btn{
+    display:inline-block;background:transparent;color:#e7ded4;border:none;
+    padding:7px 14px;margin:0 2px;font-size:15px;font-weight:600;cursor:pointer;
+    border-radius:8px;white-space:nowrap;transition:background .15s,color .15s;
+  }
+  .tab-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+  .tab-btn.active{background:var(--orange-600);color:#fff;}
+  .page-counter{flex:0 0 auto;color:#e7ded4;font-size:15px;padding:0 12px;white-space:nowrap;}
+
+  /* ---------- Pager ---------- */
+  main.pager{flex:1 1 auto;position:relative;overflow:hidden;}
+  .page-view{position:absolute;inset:0;display:none;flex-direction:row;align-items:stretch;background:var(--bg);}
+  .page-view.active{display:flex;}
+
+  .slide-image-col{
+    width:50%;flex:0 0 50%;height:100%;background:#ece7e0;position:relative;
+    display:flex;align-items:center;justify-content:center;padding:16px;
+  }
+  .slide-image-col img.slide-img{max-width:100%;max-height:100%;object-fit:contain;display:block;box-shadow:0 2px 14px rgba(30,20,10,.18);border-radius:4px;}
+
+  .text-panel{width:50%;flex:0 0 50%;height:100%;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;}
+  .read-controls{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:16px 30px 0;}
+  .read-toggle-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--orange-600);color:#fff;border:none;border-radius:20px;
+    padding:6px 16px;font-size:15px;cursor:pointer;transition:background .15s;
+    white-space:nowrap;
+  }
+  .read-toggle-btn:hover{background:var(--orange-500);}
+  .read-toggle-btn.playing{background:var(--teal-600);}
+  .read-toggle-btn.paused{background:var(--orange-500);}
+  .read-toggle-btn .icon{font-size:15px;}
+  .rate-select{
+    border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--text);
+    font-size:15px;padding:4px 10px;cursor:pointer;
+  }
+  .slide-text-col{flex:1 1 auto;padding:14px 30px 22px;min-width:0;box-sizing:border-box;overflow-y:auto;}
+  .slide-text-col h3{margin:0 0 12px;font-size:18px;color:var(--orange-600);}
+  .slide-text-col p{margin:9px 0;font-size:15px;color:var(--text);text-align:justify;}
+  .slide-text-col ul{margin:6px 0 14px;padding-left:0;list-style:none;}
+  .slide-text-col ul li{position:relative;margin:7px 0;padding-left:20px;font-size:15px;color:var(--text);text-align:justify;}
+  .slide-text-col ul li::before{content:"";position:absolute;left:2px;top:0.55em;width:7px;height:7px;border-radius:2px;background:var(--orange-600);transform:rotate(45deg);}
+  .kc-box{background:#eef6f6;border-left:4px solid var(--teal-600);border-radius:6px;padding:10px 14px;margin:14px 0 6px;}
+  .kc-label{font-weight:700;color:var(--teal-600);margin-bottom:4px;font-size:15px;letter-spacing:.3px;}
+  .kc-box p{margin:4px 0;font-size:15px;color:var(--text-soft);}
+
+  .page-tag{
+    position:absolute;left:10px;bottom:10px;
+    font-size:15px;color:#fff;background:rgba(26,22,20,.75);
+    padding:2px 10px;border-radius:6px;line-height:1.4;
+  }
+
+  footer.site-footer{
+    flex:0 0 auto;background:var(--ink-900);color:#cbb9a4;font-size:15px;
+    padding:5px 20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  }
+
+  /* ---------- Pager nav buttons ---------- */
+  .pager-controls{position:fixed;right:22px;bottom:46px;z-index:100;display:flex;gap:10px;align-items:center;}
+  .pager-btn{
+    background:var(--orange-600);color:#fff;border:none;width:50px;height:50px;border-radius:50%;
+    font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 10px rgba(30,20,10,.4);transition:background .15s,transform .1s;user-select:none;
+  }
+  .pager-btn:hover{background:var(--orange-500);transform:translateY(-1px);}
+  .pager-btn.disabled{background:#c9beb1;cursor:default;box-shadow:none;}
+  .pager-btn.disabled:hover{background:#c9beb1;transform:none;}
+
+  @media (max-width:820px){
+    .page-view{flex-direction:column;overflow-y:auto;}
+    .slide-image-col{width:100%;flex:0 0 auto;height:36%;}
+    .text-panel{width:100%;flex:1 1 auto;height:auto;}
+    .slide-text-col{width:100%;flex:1 1 auto;height:auto;}
+    .read-controls{padding:10px 16px 0;}
+    header.site-header .title-block h1{font-size:15px;}
+    header.site-header img.logo{height:28px;}
+    header.site-header .brand-right img.logo{height:22px;}
+    .pager-btn{width:42px;height:42px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand-left"><img class="logo" src="assets/secdigit_white_knockout.png" alt="安數科技 SECDigit"></div>
+  <div class="title-block">
+    <h1>TCSE 2 - TOS Aurora：SecureChange 技術手冊</h1>
+    <div class="sub">Tufin Certified Security Expert 2 · SecureChange 工作流程與自動化 · 安數科技 SECDigit 中文版</div>
+  </div>
+  <div class="brand-right"><div class="divider-line"></div>
+    <svg class="logo tufin-logo" viewBox="0 0 210 90" role="img" aria-label="Tufin">
+      <text x="4" y="66" font-family="'Baloo 2','Poppins','Quicksand','Arial Rounded MT Bold',sans-serif" font-weight="800" font-size="64" fill="#ffffff" letter-spacing="-1">tufin</text>
+    </svg>
+  </div>
+</header>
+
+<nav class="tab-bar-wrap">
+  <button class="tab-arrow" id="arrowLeft" aria-label="向左">&#10094;</button>
+  <div class="tab-scroll" id="tabScroll" tabindex="0">
+    <button class="tab-btn active" data-module="0">00 課程介紹</button><button class="tab-btn" data-module="1">01 課程總覽</button><button class="tab-btn" data-module="2">02 變更請求生命週期</button><button class="tab-btn" data-module="3">03 關於工作流程</button><button class="tab-btn" data-module="4">04 從範本建立工作流程</button><button class="tab-btn" data-module="5">05 自訂工作流程</button><button class="tab-btn" data-module="6">06 工作流程欄位</button><button class="tab-btn" data-module="7">07 如何配置工作流程</button><button class="tab-btn" data-module="8">08 自動步驟</button><button class="tab-btn" data-module="9">09 分配模式</button><button class="tab-btn" data-module="10">10 存取請求</button><button class="tab-btn" data-module="11">11 風險分析</button><button class="tab-btn" data-module="12">12 設計工具 Designer</button><button class="tab-btn" data-module="13">13 進階設計工具</button><button class="tab-btn" data-module="14">14 供應配置 Provisioning</button><button class="tab-btn" data-module="15">15 授權 Authorization</button><button class="tab-btn" data-module="16">16 提交與政策安裝</button><button class="tab-btn" data-module="17">17 變更視窗</button><button class="tab-btn" data-module="18">18 實作練習</button><button class="tab-btn" data-module="19">19 認證考試與總結</button>
+  </div>
+  <button class="tab-arrow" id="arrowRight" aria-label="向右">&#10095;</button>
+  <div class="page-counter"><span id="curIdx">1</span> / <span id="totalIdx">233</span></div>
+</nav>
+
+<main class="pager" id="pager">
+<div class="page-view" data-index="0" data-module="0" data-textkey="p1" data-chapter-id="ch0">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-001.jpg" alt="第 1 頁"><div class="page-tag">第 1 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="1" data-module="0" data-textkey="p2" data-chapter-id="ch0">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-002.jpg" alt="第 2 頁"><div class="page-tag">第 2 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="2" data-module="0" data-textkey="p3" data-chapter-id="ch0">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-003.jpg" alt="第 3 頁"><div class="page-tag">第 3 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="3" data-module="0" data-textkey="p4" data-chapter-id="ch0">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-004.jpg" alt="第 4 頁"><div class="page-tag">第 4 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="4" data-module="1" data-textkey="p5" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-005.jpg" alt="第 5 頁"><div class="page-tag">第 5 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="5" data-module="1" data-textkey="p6" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-006.jpg" alt="第 6 頁"><div class="page-tag">第 6 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="6" data-module="1" data-textkey="p7" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-007.jpg" alt="第 7 頁"><div class="page-tag">第 7 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="7" data-module="1" data-textkey="p8" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-008.jpg" alt="第 8 頁"><div class="page-tag">第 8 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="8" data-module="1" data-textkey="p9" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-009.jpg" alt="第 9 頁"><div class="page-tag">第 9 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="9" data-module="1" data-textkey="p10" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-010.jpg" alt="第 10 頁"><div class="page-tag">第 10 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="10" data-module="1" data-textkey="p11" data-chapter-id="ch1">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-011.jpg" alt="第 11 頁"><div class="page-tag">第 11 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="11" data-module="2" data-textkey="p12" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-012.jpg" alt="第 12 頁"><div class="page-tag">第 12 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="12" data-module="2" data-textkey="p13" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-013.jpg" alt="第 13 頁"><div class="page-tag">第 13 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="13" data-module="2" data-textkey="p14" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-014.jpg" alt="第 14 頁"><div class="page-tag">第 14 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="14" data-module="2" data-textkey="p15" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-015.jpg" alt="第 15 頁"><div class="page-tag">第 15 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="15" data-module="2" data-textkey="p16" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-016.jpg" alt="第 16 頁"><div class="page-tag">第 16 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="16" data-module="2" data-textkey="p17" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-017.jpg" alt="第 17 頁"><div class="page-tag">第 17 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="17" data-module="2" data-textkey="p18" data-chapter-id="ch2">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-018.jpg" alt="第 18 頁"><div class="page-tag">第 18 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="18" data-module="3" data-textkey="p19" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-019.jpg" alt="第 19 頁"><div class="page-tag">第 19 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="19" data-module="3" data-textkey="p20" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-020.jpg" alt="第 20 頁"><div class="page-tag">第 20 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="20" data-module="3" data-textkey="p21" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-021.jpg" alt="第 21 頁"><div class="page-tag">第 21 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="21" data-module="3" data-textkey="p22" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-022.jpg" alt="第 22 頁"><div class="page-tag">第 22 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="22" data-module="3" data-textkey="p23" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-023.jpg" alt="第 23 頁"><div class="page-tag">第 23 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="23" data-module="3" data-textkey="p24" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-024.jpg" alt="第 24 頁"><div class="page-tag">第 24 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="24" data-module="3" data-textkey="p25" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-025.jpg" alt="第 25 頁"><div class="page-tag">第 25 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="25" data-module="3" data-textkey="p26" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-026.jpg" alt="第 26 頁"><div class="page-tag">第 26 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="26" data-module="3" data-textkey="p27" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-027.jpg" alt="第 27 頁"><div class="page-tag">第 27 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="27" data-module="3" data-textkey="p28" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-028.jpg" alt="第 28 頁"><div class="page-tag">第 28 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="28" data-module="3" data-textkey="p29" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-029.jpg" alt="第 29 頁"><div class="page-tag">第 29 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="29" data-module="3" data-textkey="p30" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-030.jpg" alt="第 30 頁"><div class="page-tag">第 30 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="30" data-module="3" data-textkey="p31" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-031.jpg" alt="第 31 頁"><div class="page-tag">第 31 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="31" data-module="3" data-textkey="p32" data-chapter-id="ch3">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-032.jpg" alt="第 32 頁"><div class="page-tag">第 32 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="32" data-module="4" data-textkey="p33" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-033.jpg" alt="第 33 頁"><div class="page-tag">第 33 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="33" data-module="4" data-textkey="p34" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-034.jpg" alt="第 34 頁"><div class="page-tag">第 34 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="34" data-module="4" data-textkey="p35" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-035.jpg" alt="第 35 頁"><div class="page-tag">第 35 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="35" data-module="4" data-textkey="p36" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-036.jpg" alt="第 36 頁"><div class="page-tag">第 36 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="36" data-module="4" data-textkey="p37" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-037.jpg" alt="第 37 頁"><div class="page-tag">第 37 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="37" data-module="4" data-textkey="p38" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-038.jpg" alt="第 38 頁"><div class="page-tag">第 38 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="38" data-module="4" data-textkey="p39" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-039.jpg" alt="第 39 頁"><div class="page-tag">第 39 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="39" data-module="4" data-textkey="p40" data-chapter-id="ch4">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-040.jpg" alt="第 40 頁"><div class="page-tag">第 40 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="40" data-module="5" data-textkey="p41" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-041.jpg" alt="第 41 頁"><div class="page-tag">第 41 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="41" data-module="5" data-textkey="p42" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-042.jpg" alt="第 42 頁"><div class="page-tag">第 42 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="42" data-module="5" data-textkey="p43" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-043.jpg" alt="第 43 頁"><div class="page-tag">第 43 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="43" data-module="5" data-textkey="p44" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-044.jpg" alt="第 44 頁"><div class="page-tag">第 44 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="44" data-module="5" data-textkey="p45" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-045.jpg" alt="第 45 頁"><div class="page-tag">第 45 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="45" data-module="5" data-textkey="p46" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-046.jpg" alt="第 46 頁"><div class="page-tag">第 46 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="46" data-module="5" data-textkey="p47" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-047.jpg" alt="第 47 頁"><div class="page-tag">第 47 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="47" data-module="5" data-textkey="p48" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-048.jpg" alt="第 48 頁"><div class="page-tag">第 48 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="48" data-module="5" data-textkey="p49" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-049.jpg" alt="第 49 頁"><div class="page-tag">第 49 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="49" data-module="5" data-textkey="p50" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-050.jpg" alt="第 50 頁"><div class="page-tag">第 50 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="50" data-module="5" data-textkey="p51" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-051.jpg" alt="第 51 頁"><div class="page-tag">第 51 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="51" data-module="5" data-textkey="p52" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-052.jpg" alt="第 52 頁"><div class="page-tag">第 52 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="52" data-module="5" data-textkey="p53" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-053.jpg" alt="第 53 頁"><div class="page-tag">第 53 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="53" data-module="5" data-textkey="p54" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-054.jpg" alt="第 54 頁"><div class="page-tag">第 54 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="54" data-module="5" data-textkey="p55" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-055.jpg" alt="第 55 頁"><div class="page-tag">第 55 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="55" data-module="5" data-textkey="p56" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-056.jpg" alt="第 56 頁"><div class="page-tag">第 56 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="56" data-module="5" data-textkey="p57" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-057.jpg" alt="第 57 頁"><div class="page-tag">第 57 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="57" data-module="5" data-textkey="p58" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-058.jpg" alt="第 58 頁"><div class="page-tag">第 58 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="58" data-module="5" data-textkey="p59" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-059.jpg" alt="第 59 頁"><div class="page-tag">第 59 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="59" data-module="5" data-textkey="p60" data-chapter-id="ch5">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-060.jpg" alt="第 60 頁"><div class="page-tag">第 60 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="60" data-module="6" data-textkey="p61" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-061.jpg" alt="第 61 頁"><div class="page-tag">第 61 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="61" data-module="6" data-textkey="p62" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-062.jpg" alt="第 62 頁"><div class="page-tag">第 62 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="62" data-module="6" data-textkey="p63" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-063.jpg" alt="第 63 頁"><div class="page-tag">第 63 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="63" data-module="6" data-textkey="p64" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-064.jpg" alt="第 64 頁"><div class="page-tag">第 64 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="64" data-module="6" data-textkey="p65" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-065.jpg" alt="第 65 頁"><div class="page-tag">第 65 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="65" data-module="6" data-textkey="p66" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-066.jpg" alt="第 66 頁"><div class="page-tag">第 66 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="66" data-module="6" data-textkey="p67" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-067.jpg" alt="第 67 頁"><div class="page-tag">第 67 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="67" data-module="6" data-textkey="p68" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-068.jpg" alt="第 68 頁"><div class="page-tag">第 68 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="68" data-module="6" data-textkey="p69" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-069.jpg" alt="第 69 頁"><div class="page-tag">第 69 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="69" data-module="6" data-textkey="p70" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-070.jpg" alt="第 70 頁"><div class="page-tag">第 70 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="70" data-module="6" data-textkey="p71" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-071.jpg" alt="第 71 頁"><div class="page-tag">第 71 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="71" data-module="6" data-textkey="p72" data-chapter-id="ch6">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-072.jpg" alt="第 72 頁"><div class="page-tag">第 72 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="72" data-module="7" data-textkey="p73" data-chapter-id="ch7">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-073.jpg" alt="第 73 頁"><div class="page-tag">第 73 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="73" data-module="7" data-textkey="p74" data-chapter-id="ch7">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-074.jpg" alt="第 74 頁"><div class="page-tag">第 74 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="74" data-module="8" data-textkey="p75" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-075.jpg" alt="第 75 頁"><div class="page-tag">第 75 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="75" data-module="8" data-textkey="p76" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-076.jpg" alt="第 76 頁"><div class="page-tag">第 76 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="76" data-module="8" data-textkey="p77" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-077.jpg" alt="第 77 頁"><div class="page-tag">第 77 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="77" data-module="8" data-textkey="p78" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-078.jpg" alt="第 78 頁"><div class="page-tag">第 78 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="78" data-module="8" data-textkey="p79" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-079.jpg" alt="第 79 頁"><div class="page-tag">第 79 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="79" data-module="8" data-textkey="p80" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-080.jpg" alt="第 80 頁"><div class="page-tag">第 80 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="80" data-module="8" data-textkey="p81" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-081.jpg" alt="第 81 頁"><div class="page-tag">第 81 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="81" data-module="8" data-textkey="p82" data-chapter-id="ch8">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-082.jpg" alt="第 82 頁"><div class="page-tag">第 82 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="82" data-module="9" data-textkey="p83" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-083.jpg" alt="第 83 頁"><div class="page-tag">第 83 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="83" data-module="9" data-textkey="p84" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-084.jpg" alt="第 84 頁"><div class="page-tag">第 84 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="84" data-module="9" data-textkey="p85" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-085.jpg" alt="第 85 頁"><div class="page-tag">第 85 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="85" data-module="9" data-textkey="p86" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-086.jpg" alt="第 86 頁"><div class="page-tag">第 86 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="86" data-module="9" data-textkey="p87" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-087.jpg" alt="第 87 頁"><div class="page-tag">第 87 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="87" data-module="9" data-textkey="p88" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-088.jpg" alt="第 88 頁"><div class="page-tag">第 88 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="88" data-module="9" data-textkey="p89" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-089.jpg" alt="第 89 頁"><div class="page-tag">第 89 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="89" data-module="9" data-textkey="p90" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-090.jpg" alt="第 90 頁"><div class="page-tag">第 90 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="90" data-module="9" data-textkey="p91" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-091.jpg" alt="第 91 頁"><div class="page-tag">第 91 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="91" data-module="9" data-textkey="p92" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-092.jpg" alt="第 92 頁"><div class="page-tag">第 92 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="92" data-module="9" data-textkey="p93" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-093.jpg" alt="第 93 頁"><div class="page-tag">第 93 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="93" data-module="9" data-textkey="p94" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-094.jpg" alt="第 94 頁"><div class="page-tag">第 94 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="94" data-module="9" data-textkey="p95" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-095.jpg" alt="第 95 頁"><div class="page-tag">第 95 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="95" data-module="9" data-textkey="p96" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-096.jpg" alt="第 96 頁"><div class="page-tag">第 96 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="96" data-module="9" data-textkey="p97" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-097.jpg" alt="第 97 頁"><div class="page-tag">第 97 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="97" data-module="9" data-textkey="p98" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-098.jpg" alt="第 98 頁"><div class="page-tag">第 98 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="98" data-module="9" data-textkey="p99" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-099.jpg" alt="第 99 頁"><div class="page-tag">第 99 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="99" data-module="9" data-textkey="p100" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-100.jpg" alt="第 100 頁"><div class="page-tag">第 100 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="100" data-module="9" data-textkey="p101" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-101.jpg" alt="第 101 頁"><div class="page-tag">第 101 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="101" data-module="9" data-textkey="p102" data-chapter-id="ch9">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-102.jpg" alt="第 102 頁"><div class="page-tag">第 102 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="102" data-module="10" data-textkey="p103" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-103.jpg" alt="第 103 頁"><div class="page-tag">第 103 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="103" data-module="10" data-textkey="p104" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-104.jpg" alt="第 104 頁"><div class="page-tag">第 104 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="104" data-module="10" data-textkey="p105" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-105.jpg" alt="第 105 頁"><div class="page-tag">第 105 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="105" data-module="10" data-textkey="p106" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-106.jpg" alt="第 106 頁"><div class="page-tag">第 106 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="106" data-module="10" data-textkey="p107" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-107.jpg" alt="第 107 頁"><div class="page-tag">第 107 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="107" data-module="10" data-textkey="p108" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-108.jpg" alt="第 108 頁"><div class="page-tag">第 108 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="108" data-module="10" data-textkey="p109" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-109.jpg" alt="第 109 頁"><div class="page-tag">第 109 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="109" data-module="10" data-textkey="p110" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-110.jpg" alt="第 110 頁"><div class="page-tag">第 110 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="110" data-module="10" data-textkey="p111" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-111.jpg" alt="第 111 頁"><div class="page-tag">第 111 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="111" data-module="10" data-textkey="p112" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-112.jpg" alt="第 112 頁"><div class="page-tag">第 112 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="112" data-module="10" data-textkey="p113" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-113.jpg" alt="第 113 頁"><div class="page-tag">第 113 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="113" data-module="10" data-textkey="p114" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-114.jpg" alt="第 114 頁"><div class="page-tag">第 114 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="114" data-module="10" data-textkey="p115" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-115.jpg" alt="第 115 頁"><div class="page-tag">第 115 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="115" data-module="10" data-textkey="p116" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-116.jpg" alt="第 116 頁"><div class="page-tag">第 116 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="116" data-module="10" data-textkey="p117" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-117.jpg" alt="第 117 頁"><div class="page-tag">第 117 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="117" data-module="10" data-textkey="p118" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-118.jpg" alt="第 118 頁"><div class="page-tag">第 118 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="118" data-module="10" data-textkey="p119" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-119.jpg" alt="第 119 頁"><div class="page-tag">第 119 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="119" data-module="10" data-textkey="p120" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-120.jpg" alt="第 120 頁"><div class="page-tag">第 120 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="120" data-module="10" data-textkey="p121" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-121.jpg" alt="第 121 頁"><div class="page-tag">第 121 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="121" data-module="10" data-textkey="p122" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-122.jpg" alt="第 122 頁"><div class="page-tag">第 122 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="122" data-module="10" data-textkey="p123" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-123.jpg" alt="第 123 頁"><div class="page-tag">第 123 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="123" data-module="10" data-textkey="p124" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-124.jpg" alt="第 124 頁"><div class="page-tag">第 124 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="124" data-module="10" data-textkey="p125" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-125.jpg" alt="第 125 頁"><div class="page-tag">第 125 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="125" data-module="10" data-textkey="p126" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-126.jpg" alt="第 126 頁"><div class="page-tag">第 126 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="126" data-module="10" data-textkey="p127" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-127.jpg" alt="第 127 頁"><div class="page-tag">第 127 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="127" data-module="10" data-textkey="p128" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-128.jpg" alt="第 128 頁"><div class="page-tag">第 128 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="128" data-module="10" data-textkey="p129" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-129.jpg" alt="第 129 頁"><div class="page-tag">第 129 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="129" data-module="10" data-textkey="p130" data-chapter-id="ch10">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-130.jpg" alt="第 130 頁"><div class="page-tag">第 130 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="130" data-module="11" data-textkey="p131" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-131.jpg" alt="第 131 頁"><div class="page-tag">第 131 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="131" data-module="11" data-textkey="p132" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-132.jpg" alt="第 132 頁"><div class="page-tag">第 132 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="132" data-module="11" data-textkey="p133" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-133.jpg" alt="第 133 頁"><div class="page-tag">第 133 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="133" data-module="11" data-textkey="p134" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-134.jpg" alt="第 134 頁"><div class="page-tag">第 134 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="134" data-module="11" data-textkey="p135" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-135.jpg" alt="第 135 頁"><div class="page-tag">第 135 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="135" data-module="11" data-textkey="p136" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-136.jpg" alt="第 136 頁"><div class="page-tag">第 136 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="136" data-module="11" data-textkey="p137" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-137.jpg" alt="第 137 頁"><div class="page-tag">第 137 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="137" data-module="11" data-textkey="p138" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-138.jpg" alt="第 138 頁"><div class="page-tag">第 138 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="138" data-module="11" data-textkey="p139" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-139.jpg" alt="第 139 頁"><div class="page-tag">第 139 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="139" data-module="11" data-textkey="p140" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-140.jpg" alt="第 140 頁"><div class="page-tag">第 140 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="140" data-module="11" data-textkey="p141" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-141.jpg" alt="第 141 頁"><div class="page-tag">第 141 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="141" data-module="11" data-textkey="p142" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-142.jpg" alt="第 142 頁"><div class="page-tag">第 142 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="142" data-module="11" data-textkey="p143" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-143.jpg" alt="第 143 頁"><div class="page-tag">第 143 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="143" data-module="11" data-textkey="p144" data-chapter-id="ch11">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-144.jpg" alt="第 144 頁"><div class="page-tag">第 144 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="144" data-module="12" data-textkey="p145" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-145.jpg" alt="第 145 頁"><div class="page-tag">第 145 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="145" data-module="12" data-textkey="p146" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-146.jpg" alt="第 146 頁"><div class="page-tag">第 146 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="146" data-module="12" data-textkey="p147" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-147.jpg" alt="第 147 頁"><div class="page-tag">第 147 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="147" data-module="12" data-textkey="p148" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-148.jpg" alt="第 148 頁"><div class="page-tag">第 148 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="148" data-module="12" data-textkey="p149" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-149.jpg" alt="第 149 頁"><div class="page-tag">第 149 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="149" data-module="12" data-textkey="p150" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-150.jpg" alt="第 150 頁"><div class="page-tag">第 150 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="150" data-module="12" data-textkey="p151" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-151.jpg" alt="第 151 頁"><div class="page-tag">第 151 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="151" data-module="12" data-textkey="p152" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-152.jpg" alt="第 152 頁"><div class="page-tag">第 152 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="152" data-module="12" data-textkey="p153" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-153.jpg" alt="第 153 頁"><div class="page-tag">第 153 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="153" data-module="12" data-textkey="p154" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-154.jpg" alt="第 154 頁"><div class="page-tag">第 154 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="154" data-module="12" data-textkey="p155" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-155.jpg" alt="第 155 頁"><div class="page-tag">第 155 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="155" data-module="12" data-textkey="p156" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-156.jpg" alt="第 156 頁"><div class="page-tag">第 156 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="156" data-module="12" data-textkey="p157" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-157.jpg" alt="第 157 頁"><div class="page-tag">第 157 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="157" data-module="12" data-textkey="p158" data-chapter-id="ch12">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-158.jpg" alt="第 158 頁"><div class="page-tag">第 158 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="158" data-module="13" data-textkey="p159" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-159.jpg" alt="第 159 頁"><div class="page-tag">第 159 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="159" data-module="13" data-textkey="p160" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-160.jpg" alt="第 160 頁"><div class="page-tag">第 160 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="160" data-module="13" data-textkey="p161" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-161.jpg" alt="第 161 頁"><div class="page-tag">第 161 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="161" data-module="13" data-textkey="p162" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-162.jpg" alt="第 162 頁"><div class="page-tag">第 162 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="162" data-module="13" data-textkey="p163" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-163.jpg" alt="第 163 頁"><div class="page-tag">第 163 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="163" data-module="13" data-textkey="p164" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-164.jpg" alt="第 164 頁"><div class="page-tag">第 164 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="164" data-module="13" data-textkey="p165" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-165.jpg" alt="第 165 頁"><div class="page-tag">第 165 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="165" data-module="13" data-textkey="p166" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-166.jpg" alt="第 166 頁"><div class="page-tag">第 166 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="166" data-module="13" data-textkey="p167" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-167.jpg" alt="第 167 頁"><div class="page-tag">第 167 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="167" data-module="13" data-textkey="p168" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-168.jpg" alt="第 168 頁"><div class="page-tag">第 168 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="168" data-module="13" data-textkey="p169" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-169.jpg" alt="第 169 頁"><div class="page-tag">第 169 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="169" data-module="13" data-textkey="p170" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-170.jpg" alt="第 170 頁"><div class="page-tag">第 170 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="170" data-module="13" data-textkey="p171" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-171.jpg" alt="第 171 頁"><div class="page-tag">第 171 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="171" data-module="13" data-textkey="p172" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-172.jpg" alt="第 172 頁"><div class="page-tag">第 172 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="172" data-module="13" data-textkey="p173" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-173.jpg" alt="第 173 頁"><div class="page-tag">第 173 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="173" data-module="13" data-textkey="p174" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-174.jpg" alt="第 174 頁"><div class="page-tag">第 174 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="174" data-module="13" data-textkey="p175" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-175.jpg" alt="第 175 頁"><div class="page-tag">第 175 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="175" data-module="13" data-textkey="p176" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-176.jpg" alt="第 176 頁"><div class="page-tag">第 176 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="176" data-module="13" data-textkey="p177" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-177.jpg" alt="第 177 頁"><div class="page-tag">第 177 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="177" data-module="13" data-textkey="p178" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-178.jpg" alt="第 178 頁"><div class="page-tag">第 178 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="178" data-module="13" data-textkey="p179" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-179.jpg" alt="第 179 頁"><div class="page-tag">第 179 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="179" data-module="13" data-textkey="p180" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-180.jpg" alt="第 180 頁"><div class="page-tag">第 180 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="180" data-module="13" data-textkey="p181" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-181.jpg" alt="第 181 頁"><div class="page-tag">第 181 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="181" data-module="13" data-textkey="p182" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-182.jpg" alt="第 182 頁"><div class="page-tag">第 182 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="182" data-module="13" data-textkey="p183" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-183.jpg" alt="第 183 頁"><div class="page-tag">第 183 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="183" data-module="13" data-textkey="p184" data-chapter-id="ch13">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-184.jpg" alt="第 184 頁"><div class="page-tag">第 184 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="184" data-module="14" data-textkey="p185" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-185.jpg" alt="第 185 頁"><div class="page-tag">第 185 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="185" data-module="14" data-textkey="p186" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-186.jpg" alt="第 186 頁"><div class="page-tag">第 186 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="186" data-module="14" data-textkey="p187" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-187.jpg" alt="第 187 頁"><div class="page-tag">第 187 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="187" data-module="14" data-textkey="p188" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-188.jpg" alt="第 188 頁"><div class="page-tag">第 188 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="188" data-module="14" data-textkey="p189" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-189.jpg" alt="第 189 頁"><div class="page-tag">第 189 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="189" data-module="14" data-textkey="p190" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-190.jpg" alt="第 190 頁"><div class="page-tag">第 190 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="190" data-module="14" data-textkey="p191" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-191.jpg" alt="第 191 頁"><div class="page-tag">第 191 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="191" data-module="14" data-textkey="p192" data-chapter-id="ch14">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-192.jpg" alt="第 192 頁"><div class="page-tag">第 192 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="192" data-module="15" data-textkey="p193" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-193.jpg" alt="第 193 頁"><div class="page-tag">第 193 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="193" data-module="15" data-textkey="p194" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-194.jpg" alt="第 194 頁"><div class="page-tag">第 194 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="194" data-module="15" data-textkey="p195" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-195.jpg" alt="第 195 頁"><div class="page-tag">第 195 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="195" data-module="15" data-textkey="p196" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-196.jpg" alt="第 196 頁"><div class="page-tag">第 196 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="196" data-module="15" data-textkey="p197" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-197.jpg" alt="第 197 頁"><div class="page-tag">第 197 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="197" data-module="15" data-textkey="p198" data-chapter-id="ch15">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-198.jpg" alt="第 198 頁"><div class="page-tag">第 198 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="198" data-module="16" data-textkey="p199" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-199.jpg" alt="第 199 頁"><div class="page-tag">第 199 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="199" data-module="16" data-textkey="p200" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-200.jpg" alt="第 200 頁"><div class="page-tag">第 200 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="200" data-module="16" data-textkey="p201" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-201.jpg" alt="第 201 頁"><div class="page-tag">第 201 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="201" data-module="16" data-textkey="p202" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-202.jpg" alt="第 202 頁"><div class="page-tag">第 202 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="202" data-module="16" data-textkey="p203" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-203.jpg" alt="第 203 頁"><div class="page-tag">第 203 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="203" data-module="16" data-textkey="p204" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-204.jpg" alt="第 204 頁"><div class="page-tag">第 204 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="204" data-module="16" data-textkey="p205" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-205.jpg" alt="第 205 頁"><div class="page-tag">第 205 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="205" data-module="16" data-textkey="p206" data-chapter-id="ch16">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-206.jpg" alt="第 206 頁"><div class="page-tag">第 206 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="206" data-module="17" data-textkey="p207" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-207.jpg" alt="第 207 頁"><div class="page-tag">第 207 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="207" data-module="17" data-textkey="p208" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-208.jpg" alt="第 208 頁"><div class="page-tag">第 208 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="208" data-module="17" data-textkey="p209" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-209.jpg" alt="第 209 頁"><div class="page-tag">第 209 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="209" data-module="17" data-textkey="p210" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-210.jpg" alt="第 210 頁"><div class="page-tag">第 210 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="210" data-module="17" data-textkey="p211" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-211.jpg" alt="第 211 頁"><div class="page-tag">第 211 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="211" data-module="17" data-textkey="p212" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-212.jpg" alt="第 212 頁"><div class="page-tag">第 212 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="212" data-module="17" data-textkey="p213" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-213.jpg" alt="第 213 頁"><div class="page-tag">第 213 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="213" data-module="17" data-textkey="p214" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-214.jpg" alt="第 214 頁"><div class="page-tag">第 214 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="214" data-module="17" data-textkey="p215" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-215.jpg" alt="第 215 頁"><div class="page-tag">第 215 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="215" data-module="17" data-textkey="p216" data-chapter-id="ch17">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-216.jpg" alt="第 216 頁"><div class="page-tag">第 216 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="216" data-module="18" data-textkey="p217" data-chapter-id="ch18">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-217.jpg" alt="第 217 頁"><div class="page-tag">第 217 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="217" data-module="19" data-textkey="p218" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-218.jpg" alt="第 218 頁"><div class="page-tag">第 218 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="218" data-module="19" data-textkey="p219" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-219.jpg" alt="第 219 頁"><div class="page-tag">第 219 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="219" data-module="19" data-textkey="p220" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-220.jpg" alt="第 220 頁"><div class="page-tag">第 220 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="220" data-module="19" data-textkey="p221" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-221.jpg" alt="第 221 頁"><div class="page-tag">第 221 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="221" data-module="19" data-textkey="p222" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-222.jpg" alt="第 222 頁"><div class="page-tag">第 222 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="222" data-module="19" data-textkey="p223" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-223.jpg" alt="第 223 頁"><div class="page-tag">第 223 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="223" data-module="19" data-textkey="p224" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-224.jpg" alt="第 224 頁"><div class="page-tag">第 224 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="224" data-module="19" data-textkey="p225" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-225.jpg" alt="第 225 頁"><div class="page-tag">第 225 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="225" data-module="19" data-textkey="p226" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-226.jpg" alt="第 226 頁"><div class="page-tag">第 226 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="226" data-module="19" data-textkey="p227" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-227.jpg" alt="第 227 頁"><div class="page-tag">第 227 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="227" data-module="19" data-textkey="p228" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-228.jpg" alt="第 228 頁"><div class="page-tag">第 228 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="228" data-module="19" data-textkey="p229" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-229.jpg" alt="第 229 頁"><div class="page-tag">第 229 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="229" data-module="19" data-textkey="p230" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-230.jpg" alt="第 230 頁"><div class="page-tag">第 230 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="230" data-module="19" data-textkey="p231" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-231.jpg" alt="第 231 頁"><div class="page-tag">第 231 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="231" data-module="19" data-textkey="p232" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-232.jpg" alt="第 232 頁"><div class="page-tag">第 232 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+<div class="page-view" data-index="232" data-module="19" data-textkey="p233" data-chapter-id="ch19">
+  <div class="slide-image-col"><img class="slide-img" data-src="slides/page-233.jpg" alt="第 233 頁"><div class="page-tag">第 233 頁</div></div>
+  <div class="text-panel">
+    <div class="read-controls">
+      <button class="read-toggle-btn" type="button"></button>
+      <select class="rate-select" title="朗讀速度"></select>
+    </div>
+    <div class="slide-text-col"></div>
+  </div>
+</div>
+</main>
+
+<div class="pager-controls">
+  <button class="pager-btn" id="prevBtn" aria-label="上一頁" title="上一頁">&#8592;</button>
+  <button class="pager-btn" id="nextBtn" aria-label="下一頁" title="下一頁">&#8594;</button>
+</div>
+
+<footer class="site-footer">
+  <span>安數科技股份有限公司 SECDigit｜Tufin Authorized Technical Services Partner (ATP)</span>
+  <span>本手冊內容參考 Tufin Orchestration Suite R25-2 官方知識庫（Knowledge Center）編製，僅供內部教育訓練與客戶導入參考使用</span>
+</footer>
+
+<script>
+(function(){
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.page-view'));
+  var total = pages.length;
+  var current = 0;
+  var curIdxEl = document.getElementById('curIdx');
+  var totalIdxEl = document.getElementById('totalIdx');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll('.tab-btn'));
+  totalIdxEl.textContent = total;
+
+  var moduleFirstIndex = {"0": 0, "1": 4, "2": 11, "3": 18, "4": 32, "5": 40, "6": 60, "7": 72, "8": 74, "9": 82, "10": 102, "11": 130, "12": 144, "13": 158, "14": 184, "15": 192, "16": 198, "17": 206, "18": 216, "19": 217};
+
+  var TEXT_MAP = {"p1": "<h3>TCSE 2－TOS Aurora：SecureChange</h3><p>Tufin 技術認證課程（TCSE）第二階段：TOS Aurora SecureChange 模組。</p>", "p2": "<h3>課程封面（續頁）</h3><p>（本頁為封面裝飾頁，無文字內容。）</p>", "p3": "<h3>課程適用對象</h3><p>誰適合參加 TCSE 2－TOS Aurora：SecureChange 認證課程？</p><p>本認證課程深入介紹 SecureChange。課程模組涵蓋防火牆管理員最常使用的多項 Tufin 解決方案，內容從取得針對您網路量身打造的建議，到更新並提交管理裝置的變更。</p><p>課程結束時，您將能透過測驗與虛擬實驗室練習來驗證所學並累積實務經驗。本課程適合已取得 TCSE 1 認證的學員，以及希望驗證自身專業能力的資深 Tufin 使用者。</p><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>根據 R25-2 官方文件，SecureChange 的 SLA 設定可進一步指定「營業時間」與「營業日」，計算工單期限時能排除週末與國定假日；管理者也能匯入／匯出自訂的假日清單，避免例如週五下午開始、假日期間無人處理卻被誤判逾期的情況。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>根據 R25-2 官方文件，SecureChange 的 SLA 設定可進一步指定「營業時間」與「營業日」，計算工單期限時能排除週末與國定假日；管理者也能匯入／匯出自訂的假日清單，避免例如週五下午開始、假日期間無人處理卻被誤判逾期的情況。</p></div>", "p4": "<h3>課程要求與目標</h3><p>課程要求：本課程分為多個單元，每個單元包含數堂課。各堂課須依序完成；完成所有課程後將進行測驗，須達到至少 80% 的分數才能完成本課程。</p><p>時間需求：完成本課程約需 3 小時。課程目標：介紹 SecureChange 工作流程及其效益；說明如何從建立自訂工作流程到套用現成範本，再到善用整合式自動化功能；深入探討 SecureChange 用於提升工作流程效率的核心工具，包括風險分析、Designer 與供應配置；並透過實作練習，親自探索 Aurora 平台以驗證所學。</p>", "p5": "<h3>課程內容導覽</h3><p>第 1 堂課</p>", "p6": "<h3>為什麼選擇 Tufin？</h3><p>為什麼選擇 Tufin？</p><p>Tufin 讓組織能在地端、多雲與混合雲環境中，自動化安全政策、分析風險、管理網路組態、提供存取權限，並維持持續合規。</p><p>網路與資安人員能精確掌握並控管所有地端與雲端邊界資產的可視性；雲端團隊則能輕鬆檢視應用程式層級的流量，並在雲原生基礎架構、工作負載與開發管道中部署安全政策。</p>", "p7": "<h3>回顧 TCSE 1</h3><p>在 TCSE 1 中，我們介紹了 TOS Aurora 套件及其模組與功能，並聚焦於 SecureTrack：如何讓您綜觀網路環境、建立並管理安全政策，以及透過以下項目自動化合規作業：</p><ul><li>SecureTrack+ 總覽與設定</li><li>如何檢視您的網路</li><li>規則檢視器</li><li>管理變更並準備清理</li><li>稽核與合規</li></ul>", "p8": "<h3>TCSE 2 課程重點</h3><p>進入 TCSE 2，我們將延續 SecureTrack 中所學的 Aurora 功能基礎，把重點轉向 SecureChange 如何管理並自動化網路變更。</p><p>本課程將聚焦於 SecureChange 的各項功能，說明它如何讓您在維持安全性、提升敏捷性的同時，結合 SecureTrack 的能力對網路進行變更。</p>", "p9": "<h3>TCSE 2 課程模組導覽</h3><p>關於工作流程：說明 SecureChange 所定義的工作流程是什麼，以及它們在您組織中可能已有的樣貌。</p><p>建立工作流程：說明如何在 SecureChange 中開始建立工作流程，無論是套用範本或從零開始。</p><p>工作流程自動化：說明如何透過自動化 SecureChange 的工作流程，提升敏捷性並更有效運用資源。</p><p>工作流程工具：探索 SecureChange 工具背後的邏輯與整合方式，協助建立並推送網路變更。</p><p>實作練習：透過引導式的模擬環境親自操作 SecureChange，驗證所學並探索平台功能。</p>", "p10": "<h3>SecureChange 效益總覽</h3><p>SecureChange 透過網路變更設計自動化與規則生命週期管理，可將網路變更的 SLA 縮短達 90%。</p>", "p11": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p12": "<h3>變更請求生命週期</h3><p>第 2 堂課</p>", "p13": "<h3>審批流程</h3><p>大多數組織會使用如 Remedy 或 ServiceNow 等系統來處理變更工單。一般而言，審批流程會依循工單由一個群組流轉至下一個群組的模式：</p><ul><li>審批者：審查請求，決定核准或駁回</li></ul><ul><li>維運或工程團隊：設計並實作變更</li></ul><ul><li>網路團隊：完整落實該項變更</li></ul>", "p14": "<h3>審批流程的挑戰</h3><p>審批流程雖然為工單建立了標準化的處理路徑，但每個環節仍各自面臨挑戰。請求者往往只能以簡單文字描述需求；審批者必須嘗試準確解讀這些需求，並在對潛在風險所知有限的情況下判斷是否核准。維運與工程團隊則常須以繁瑣的人工方式，設計出既能在網路中正確運作、又能符合business需求與資安合規標準的變更。</p>", "p15": "<h3>審批流程困難點示意</h3><p>本頁以圖示呈現前一頁所述審批流程中，三種角色各自面臨的困境：請求者只能以簡單文字描述需求，難以精確傳達實際情況；審批者須在缺乏風險資訊的情況下判斷是否核准；維運與工程團隊則必須以人工方式設計變更，同時兼顧網路正確性與資安合規要求。</p>", "p16": "<h3>SecureChange 總覽</h3><p>SecureChange 是 Aurora 專為安全政策變更請求打造的變更管理應用程式。</p><p>從提交、設計、資安評估、審批到落實，全程管理整個請求生命週期，讓您確信 SecureChange 能夠：</p><ul><li>提供快速、自動且可稽核的網路安全變更流程</li></ul><ul><li>對網路安全變更執行具彈性的流程規範</li></ul><ul><li>內建資安與連線檢查，簡化維運作業</li></ul><ul><li>將風險影響降到最低</li></ul>", "p17": "<h3>SecureChange 工作流程的價值</h3><p>SecureChange 工作流程讓您能自訂審批步驟，並為每個步驟（無論是個人或群組）明確指定負責歸屬，貼合您實際的營運需求。SecureChange 的自動化功能結合 SecureTrack 完整的可視性，讓這些工作流程成為簡化維運、同時不犧牲安全性的強大工具。這套整合解決方案讓您在確保嚴謹資安措施到位的同時，也能達成營運效率，使流程與業界最佳實務接軌。</p>", "p18": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p19": "<h3>關於工作流程</h3><p>第 3 堂課</p><p>SecureChange 內建的自動化工作流程可以：</p><ul><li>支援自訂</li></ul><ul><li>縮短存取請求的處理時間</li></ul><ul><li>建立明確的步驟與角色以改善流程</li></ul><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 版本新增了 Zscaler ZIA 與 SecureChange 的整合：當存取請求涉及 Zscaler ZIA 防護的流量時，系統能自動選取正確的目標，並可直接套用風險分析、Designer 與 Verifier 等既有工具，不需另外手動指定目標裝置。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 版本新增了 Zscaler ZIA 與 SecureChange 的整合：當存取請求涉及 Zscaler ZIA 防護的流量時，系統能自動選取正確的目標，並可直接套用風險分析、Designer 與 Verifier 等既有工具，不需另外手動指定目標裝置。</p></div>", "p20": "<h3>預先定義的工作流程範本</h3><p>為簡化建立新工作流程的過程，SecureChange 提供四種現成的工作流程範本。這些範本已內建處理請求所需的關鍵步驟與欄位，可做為隨插即用的解決方案，快速上線使用。</p><p>憑藉 SecureChange 的彈性，您可自由調整這些範本以符合組織的特定需求，包括新增或移除步驟、修改每個步驟所需填寫的資訊、自動化指派委派，或依偏好重新命名步驟。</p><p>請參閱下方圖示，了解這些範本各自包含哪些步驟。</p>", "p21": "<h3>範本步驟示意（一）</h3><p>存取請求範本：提交存取請求 → 業務審核 → 技術設計 → 安全審查 → 執行，共 5 個步驟。</p><p>移除存取請求範本：提交移除存取請求 → 核准 → 執行，共 3 個步驟。</p>", "p22": "<h3>範本步驟示意（二）</h3><p>群組物件請求範本：提交網路物件群組請求 → 核准 → 執行，共 3 個步驟。</p><p>一般請求範本：提交一般請求 → 核准 → 執行，共 3 個步驟。</p>", "p23": "<h3>範本步驟示意（三）</h3><p>透過運用範本，能大幅減少從零開始建立工作流程所需的時間與心力。</p><p>自訂範本可依您的網路安全框架調整工作流程，在提升營運效率、解決組織特有挑戰的同時，也能實現高效的請求管理，並與現有流程無縫整合。</p>", "p24": "<h3>自訂工作流程開發：步驟一</h3><p>使用 SecureChange 工作流程時，最重要的任務之一，就是正確辨識並將組織內部的流程轉譯為 SC 工作流程。我們可以透過簡單的三步驟流程來達成：1. 辨識現有流程與可改善之處：先花點時間釐清目前流程涉及哪些人員或團隊，列出：</p><ul><li>誰參與其中——其參與是否取決於特定條件</li><li>他們在流程中的哪個階段介入</li><li>他們各自負責的職責。這正是調整流程的絕佳時機，不妨檢視目前設計背後的原因，並思考是否需要做出調整。</li></ul>", "p25": "<h3>自訂工作流程開發：步驟二</h3><p>2. 建立泳道圖與 SC 工作流程步驟</p><p>運用前述「誰、在哪裡、做什麼、為什麼」的資訊，建立屬於您自己的泳道圖：畫出一張橫向圖表，並將資訊依欄位分開，每一欄即代表新工作流程中的一個步驟。完成後，您就能判斷自訂工作流程需要多少步驟，以及每個步驟應如何命名。</p>", "p26": "<h3>自訂工作流程開發：步驟三</h3><p>3. 測試您的新 SC 工作流程：依照泳道圖建立新的 SC 工作流程——建立所需的步驟數量，將每個步驟指派給對應的個人或團隊，並依各步驟所需調整其中的工具。</p><p>完成後，透過工作流程送出一筆測試請求，並依需要進行調整。</p>", "p27": "<h3>整合工具示意</h3><p>本頁以圖示呈現 SecureChange 整合工具在工作流程中的配置位置，依序包括：工單系統整合、SecureTrack 來源／目的地與區域可視性整合、目標建議、風險分析、Designer 與 Verifier，說明這些工具如何在請求處理的不同階段派上用場。</p>", "p28": "<h3>整合工具總覽</h3><p>SecureChange 在工作流程中內建多項整合工具，各自用於減輕變更流程中人工介入的負擔，並協助更深入了解變更將如何影響現有網路架構，包括：</p><ul><li>與工單系統整合</li><li>與 SecureTrack 整合，提供來源／目的地與區域可視性</li></ul><ul><li>目標建議</li><li>風險分析</li><li>Designer</li><li>Verifier</li></ul>", "p29": "<h3>整合工具：目標建議</h3><p>目標建議</p>", "p30": "<h3>整合工具：風險分析</h3><p>風險分析</p>", "p31": "<h3>整合工具：Designer</h3><p>Designer 設計工具</p>", "p32": "<h3>整合工具：Verifier</h3><p>Verifier 驗證工具</p>", "p33": "<h3>從範本建立工作流程</h3><p>第 4 堂課</p><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 針對「規則重新認證」工作流程做了介面與體驗上的改善，包括更新後的操作介面，以及可追溯的規則認證歷史紀錄，方便管理者事後查核某條規則過去曾由誰、於何時完成重新認證或取消認證。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 針對「規則重新認證」工作流程做了介面與體驗上的改善，包括更新後的操作介面，以及可追溯的規則認證歷史紀錄，方便管理者事後查核某條規則過去曾由誰、於何時完成重新認證或取消認證。</p></div>", "p34": "<h3>如何找到此功能</h3><p>如何找到這項功能？於「工作流程」頁籤中操作。</p>", "p35": "<h3>現成工作流程範本</h3><p>SecureChange 已為以下情境準備好現成的工作流程範本，供您直接使用：</p><ul><li>存取請求</li><li>移除存取請求</li><li>群組變更</li><li>一般請求。範本包含固定數量的預先定義步驟，帶領請求從提交一路走到在網路中完成實作。每個步驟都包含分頁，用於定義一般屬性、所需填寫的欄位資訊，以及指定組織內負責該步驟的指派對象。</li></ul>", "p36": "<h3>調整工作流程範本</h3><p>SecureChange 的工作流程範本讓您能針對常見情境快速建立工作流程，許多細節（如步驟數量、名稱與所含欄位）皆已預先設定完成。</p><p>雖然這些步驟已預先定義並可直接使用，您仍可將範本做為基礎進行調整：透過步驟下拉選單新增或移除步驟、在屬性分頁重新命名步驟，或編輯各步驟所包含（或不包含）的欄位。</p><p>若您已有一套與需求相近的既有工作流程，也可運用 SecureChange 的功能將其複製並修改，如同使用現成範本一般。</p>", "p37": "<h3>範本調整示意</h3><p>本頁以畫面示例呈現範本工作流程的步驟總覽列，顯示各步驟名稱依序排列；管理者可透過此列點選任一步驟，進入其「屬性」「欄位」「指派」分頁進行檢視與調整。</p>", "p38": "<h3>範本缺漏資訊警示</h3><p>SecureChange 的工作流程範本能協助您快速展開組織內請求的整理作業，同時也能帶來設計上的靈感。</p><p>雖然 SecureChange 範本已涵蓋大部分所需內容，仍有部分項目無法預先設定，例如某個步驟應指派給誰。</p><p>只要某個分頁缺少必要資訊，該步驟標題與缺漏資訊所在的分頁就會出現警示符號。</p><p>本例中可看到步驟 2 與步驟 3 皆有缺漏資訊；由於目前正檢視步驟 2 的表單，可看到步驟 2 缺漏的資訊位於「指派」分頁。</p>", "p39": "<h3>範本調整示意（續）</h3><p>若這些範本皆不適合，您也可以建立一個全新的工作流程。</p>", "p40": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p41": "<h3>如何建立自訂工作流程</h3><p>第 5 堂課</p>", "p42": "<h3>建立或複製工作流程</h3><p>SecureChange+ 已為以下情境準備好現成的工作流程範本，供您直接使用：</p><ul><li>存取請求</li><li>群組變更</li><li>一般請求</li><li>移除存取請求。若您已有想要複製的既有工作流程，可從工作流程清單中選取並使用複製按鈕；若這些選項皆不符合需求，也可以建立全新的工作流程。</li></ul>", "p43": "<h3>新增工作流程</h3><ul><li>點擊「新增工作流程」按鈕。</li></ul><p>名稱與說明能幫助請求者在開立工單時知道該選擇哪個工作流程。</p><ul><li>前往「工作流程」分頁。</li></ul><p>工作流程類型將決定其中會包含哪些任務。</p>", "p44": "<h3>新增步驟</h3><p>每個步驟會依建立順序列出，目前所在的步驟會以橙色標示。</p><p>若要建立新步驟，可使用下拉箭頭選擇要將新步驟加在目前步驟之前或之後。</p>", "p45": "<h3>新增步驟示意</h3><p>每個步驟都有三個分頁可供定義與設定：</p><p>屬性——為請求者／處理者說明此步驟應發生的事項。</p><p>欄位——決定請求者／處理者能看到哪些資訊，以及完成此步驟所需填寫的內容。</p><p>指派——決定由誰負責此步驟。</p>", "p46": "<h3>步驟 1 設定範例</h3><p>舉例來說，若我們以「存取請求」工作流程的步驟 1 為例，可以看到這三個分頁應如何填寫。</p><p>將此步驟重新命名為「提交存取請求」。</p><p>填寫簡短說明。</p><p>選擇是否允許請求者自行定義請求的優先等級、新增附件，及／或設定通知群組。</p>", "p47": "<h3>欄位類型設定</h3><p>選擇要新增的欄位類型，並決定是否設為必填或唯讀。</p><p>選定欄位類型（本例為文字區塊）後，設定畫面會展開，出現以下選項：</p><p>新增可編輯或唯讀的目標欄位；限制來源、目的地可填寫的內容，並可選擇是否允許從裝置中選取或匯入存取請求。</p><p>此步驟是否應包含風險分析、Designer 或 Verifier 等工具。</p>", "p48": "<h3>指派設定（步驟 1）</h3><p>最後在「指派」中，選擇誰可以處理此步驟。以最初的提交步驟而言，我們希望任何人都能開立工單。</p><p>但對於此存取請求工作流程後續的步驟，我們可能會希望由組織內特定的個人或群組負責。</p>", "p49": "<h3>步驟 1 設定完成</h3><p>設定完成後可看到步驟名稱已變更；在「欄位」分頁可看到我們新增的欄位及其所有自訂設定（名稱、已加入目標欄位、未啟用額外工具）；「指派」分頁則已設定負責處理此步驟的人員。</p>", "p50": "<h3>新增步驟 2：步驟模式</h3><p>隨著您在工作流程中新增更多步驟，仍會持續在「屬性」「欄位」「指派」三個分頁中填寫資訊。</p><p>不過，也會出現一些額外的相關選項。</p><p>例如，在建立步驟 2 時，會出現「步驟模式」選項，讓您選擇這個步驟要由處理人員手動處理，或是要讓 SecureChange 自動完成。</p>", "p51": "<h3>步驟 2 欄位調整</h3><p>您也可以開始調整所包含的欄位或其功能，讓其更貼合將負責此步驟的處理人員。</p><p>舉例來說，在步驟 2 中，我希望我的處理人員（審批者）能夠核准或駁回這項請求以進行後續作業，因此我會新增「核准／駁回」欄位。</p>", "p52": "<h3>步驟 2 欄位設定（續）</h3><p>我也希望審批者擁有與請求者相同的欄位編輯能力，因此會如同步驟 1 一樣新增存取請求欄位，並維持相同設定。</p><p>若我是透過複製步驟 1 來建立步驟 2，這些選項……</p>", "p53": "<h3>步驟 2 指派設定</h3><p>在步驟 1 中，我在「指派」分頁開放權限，讓組織內任何人都能……</p><p>但在步驟 2 中，我知道只有一位人選能負責處理網路存取請求的審批工作，那就是 Robin Green，因此我……</p>", "p54": "<h3>步驟 3、4 概念</h3><p>在步驟 3（設計）與步驟 4（實作）中，我也會採用類似的設定；不過，各步驟的處理人員……</p><p>步驟 3（設計）：我希望處理人員（設計者）能同時執行風險分析工具與 Designer 工具。風險分析可讓他們了解此變更可能對網路造成的影響，Designer 則能協助他們調整請求的設計方式；但我希望最終在一切審查完畢後，能將變更提交至網路的人是最後一位處理人員。</p>", "p55": "<h3>步驟 4 設定重點</h3><p>步驟 4（實作）：我希望這位處理人員負責審查已完成的工作。他們不需要使用風險分析工具，因為前一位處理人員已經使用過，結果也會顯示在工單上；不過，我希望這位最終審批者具備將變更提交至網路的權限，因此我會在 Designer 工具的下拉選單中勾選該選項。</p>", "p56": "<h3>工作流程狀態設定</h3><p>建立工作流程後，您可以使用標題列上的選項（包含「工作流程屬性」按鈕）調整整體工作流程的行為。</p><p>第一個選項是將工作流程狀態設為「啟用」，這樣使用者在提交工單時才能選擇此工作流程。</p><p>建議等到所有步驟都已納入並完成設定後，才將工作流程設為啟用。</p><p>您也可以選擇保留某個工作流程，但將其狀態設為未啟用，僅供參考之用。</p>", "p57": "<h3>工作流程屬性按鈕</h3><p>標題列上的「工作流程屬性」按鈕可讓您進行更多進階調整。</p>", "p58": "<h3>工作流程屬性選項</h3><p>在此您可以調整：</p><ul><li>名稱</li><li>說明</li><li>請求的確認行為（若處理人員在 # 天內未回應，是否自動確認）</li></ul><ul><li>是否可使用拓撲功能（若請求中的流量已存在，可額外設定自動關閉工單）</li></ul><ul><li>是否允許 Designer 與 Verifier 工具的進階自訂設定</li></ul><ul><li>是否允許參照其他工單</li></ul>", "p59": "<h3>工作流程 SLA 設定</h3><p>「工作流程 SLA」按鈕可讓您依可自訂的期限，追蹤工單的處理進度。</p><p>您可以設定總處理時間、針對狀態變更設定觸發條件與自動通知，並設定特定條件與通知對象。</p>", "p60": "<h3>工作流程 SLA 示意</h3><p>到目前為止，我們所看到的範本與自訂工作流程範例都聚焦在存取請求上。</p><p>但工作流程欄位中可用的選項與資訊，會依請求類型而有所不同。</p><p>接下來，我們將更深入探討讓各種請求類型得以實現的相關選項。</p>", "p61": "<h3>工作流程欄位</h3><p>第 6 堂課</p><p>SC 工作流程欄位種類豐富多元，專為強化網路管理而設計，在確保網路結構完善、合規且高效方面，扮演著關鍵角色。</p>", "p62": "<h3>工作流程欄位總覽示意</h3><p>工作流程欄位是工作流程步驟的建構單元。</p><p>每個欄位定義了處理人員應看到或需要填寫的資訊，以及他們必須執行的操作與可使用的工具。</p><p>一個步驟可以只包含單一欄位，也可以組合多個欄位以建立更完整的綜合步驟。</p>", "p63": "<h3>存取請求欄位</h3><p>存取請求欄位是最常見且用途最廣的欄位之一，可用來控制目標、來源、目的地與服務的填寫方式。</p><p>此欄位也是您選取並啟用核心 SecureChange 工具（如風險分析、Designer 或 Verifier）的地方。</p><p>包含存取請求欄位的每個工作流程步驟皆可依需求客製化：例如可設定步驟 2 的處理人員僅需使用風險分析工具，而步驟 3 的處理人員則需額外使用 Designer。</p>", "p64": "<h3>規則重新認證欄位</h3><p>此欄位用於記錄並驗證規則存在的必要性，常用於標準合規與稽核，會從 SecureTrack 的規則檢視器及其相符的支援裝置資訊中擷取規則。</p><p>此流程讓處理人員能為規則重新認證並延長其有效期限，或將已過時的規則標記為取消認證；取消認證通常是後續除役工作流程的前置步驟。</p><p>若希望處理人員只能檢視、不能修改欄位值，可選擇「唯讀」選項；「更新中繼資料」則可讓處理人員將重新認證或取消認證的決定，更新回 SecureTrack 的規則中繼資料中。</p>", "p65": "<h3>移除規則欄位</h3><p>此欄位用於管理從支援裝置中移除所選規則的流程。可搭配此欄位使用的兩項主要工具，能協助決策：Designer 與 Verifier。</p><p>Designer 會運用 SecureTrack 中的拓撲資訊與目前的規則庫資料，針對如何修改規則庫提出更精確的建議；Verifier 則能讓處理人員檢視欄位中的請求模式是否已於實際裝置政策中落實。</p><p>選擇納入 Designer 時，您可以為處理人員開放 Designer 的全部功能，或限制其更新與提交變更的能力。</p>", "p66": "<h3>除役網路物件欄位</h3><p>為確保乾淨俐落的移除流程，除役網路物件欄位讓處理人員能使用影響分析工具，檢視該伺服器在所有相關防火牆規則中的使用情形。</p><p>Designer 能針對如何修改防火牆規則以移除該物件提出精確建議；Verifier 則能依據最新取得的版本，確認指定伺服器確實已被移除。</p><p>如同先前所見，Designer 同樣可開放全部功能，或依需要加以限制。</p>", "p67": "<h3>複製伺服器政策欄位</h3><p>此欄位原名為「複製伺服器政策」，可讓您將新伺服器的存取權限加入現有政策中。</p><p>包含此欄位的工作流程，在以下情境特別實用：</p><p>伺服器除役：可新增一台備援伺服器，與即將除役的伺服器並行運作。</p><p>擴充現有網域：適用於新增網域控制站，或擴充應用程式的 Web 伺服器。</p><p>複製網路設定：適用於新增部門時，需要與其他部門相同的網路存取權限（如郵件與 LDAP）。</p>", "p68": "<h3>複製網路物件政策範例</h3><p>舉例來說，您可以新增伺服器 2.2.2.2 與 3.3.3.3，並讓它們取得與伺服器 1.1.1.1 在安全政策中完全相同的存取權限。</p><p>「複製網路物件政策」工作流程會將新伺服器 2.2.2.2 與 3.3.3.3，加入安全政策中所有包含伺服器 1.1.1.1 的規則與物件群組中。</p><p>此欄位雖然外觀與其他欄位相似，但針對階層式與非階層式政策，各自內建了特定的實作邏輯：</p>", "p69": "<h3>Designer 物件複用邏輯</h3><p>Designer 一律會優先嘗試重複使用既有物件：若某伺服器已存在於某物件中，Designer 會將新增的伺服器加入該物件，而不會另外建立新物件。</p><p>在建立新物件時，Designer 一律會嘗試將該物件加入與既有伺服器相同的位置。</p><p>包含覆寫物件或覆寫群組的規則不會自動複製到新政策中，以避免產生錯誤建議；Designer 改為針對覆寫物件提供人工變更建議，供處理人員自行實作。</p>", "p70": "<h3>欄位類型：核准／駁回、下拉選單、到期日</h3><p>核准／駁回</p><p>下拉式清單</p><p>到期日</p><p>讓請求者或處理人員可為工單設定核准或駁回，並附上原因。／建立可自訂選項的可選清單，可依字母順序或建立順序顯示。／提供日期輸入的日曆欄位，可設定工單的到期日。</p>", "p71": "<h3>欄位類型：超連結、文字欄位、文字區塊、時間</h3><p>超連結</p><p>文字欄位</p><p>文字區塊</p><p>時間</p><p>自動加上 http:// 以快速輸入超連結資訊。／可輸入單行文字。／可輸入多行文字。／可輸入時、分格式的時間資訊。</p><p>想了解工作流程中所有可用欄位嗎？歡迎查閱我們的知識庫以取得更多細節。</p><p>Tufin 知識庫網站：設定步驟欄位</p>", "p72": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p73": "<h3>如何設定工作流程</h3><p>第 7 堂課</p><p>為強化您的工作流程，SecureChange 讓您能自動化工作流程中的各項步驟。</p>", "p74": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p75": "<h3>自動步驟</h3><p>第 8 堂課</p><p>在 SecureChange 中，自動步驟能在無需人工操作的情況下執行指定的動作；自動步驟完成其指定動作後，會自動將工作流程推進至下一步。</p><p>當您希望 SecureChange 自主執行某項工具或流程以蒐集資訊時，自動步驟特別實用。這些資訊可在工作流程後續步驟中由人工專家審閱，確保分析與決策的全面性。</p>", "p76": "<h3>自動步驟標示</h3><p>工作流程中的自動步驟會以字母「A」標示，方便識別；任何步驟皆可在其「屬性」分頁中設定為自動執行。</p>", "p77": "<h3>自動步驟示意</h3><p>自動步驟選項與工具</p><p>可設定於自動步驟模式下自動執行的工具會依特定工作流程而有所不同。</p><p>審慎考量所涉及的關係人至關重要。</p>", "p78": "<h3>工具分派原則</h3><p>該如何決定哪些工具應放入哪個步驟？</p><p>先釐清誰負責哪些職責，以及工單如何分派；同時思考組織內哪些人員或團隊，應負責以人工方式處理各項工具所發現的問題。</p><p>在每個步驟中維持工具的清楚區隔，有助於提升可視性、管理與疑難排解能力；應避免在單一步驟中混用多項工具，因為不同工具所發現的問題，通常不會是由同一個團隊負責解決。</p><p>透過妥善地將工具分派至相關步驟，可確保正確的關係人取得所需的資訊與資源，進而簡化工作流程並加速問題排解。這種做法能聚焦於問題解決，並讓整體維運效能達到最佳化；關鍵在於取得工具分派、關係人職責與問題管理三者之間的平衡。</p>", "p79": "<h3>自動化工具導覽</h3><p>我們將在接下來的幾堂課中，逐一介紹各支援裝置可用的自動化工具；若您想現在就先了解，可使用下方按鈕。</p>", "p80": "<h3>支援裝置與平台連結</h3><p>Tufin 知識庫網站 ⇨ 支援的裝置與平台</p>", "p81": "<h3>動態分配預告</h3><p>希望在符合特定條件時，讓 SC 自動跳過某個步驟嗎？接下來，我們將說明 SecureChange 如何處理步驟指派，以及如何運用動態指派選項來實現這項功能。</p>", "p82": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p83": "<h3>分配模式</h3><p>第 9 堂課</p><p>分配模式決定每個工作流程步驟如何指派給處理人員。</p>", "p84": "<h3>工單處理人員的判定</h3><p>工單的處理人員會依工單後續執行的動作而有所不同：</p><ul><li>標準工單流程——任何參與者皆可承接該任務成為處理人員。</li></ul><ul><li>重新開啟的工單——處理人員為該工單關閉前最後一位處理過的人員。</li></ul><ul><li>重做工單——處理人員為任一先前步驟的處理人員，包含該工單的請求者本人。</li></ul>", "p85": "<h3>自分配與自動分配</h3><p>此模式可將特定個人或群組指派至該工作流程步驟。例如，可將工作流程 A 的步驟 2 設定為固定指派給 Henry Carr 或 ITSec 團隊。</p><p>您也可以選擇「優先指派前一位處理人員」，自動將任務指派給前一步驟的處理人員。</p><p>若選擇自動指派給某個群組而非個人，SecureChange 會以輪流方式在該群組中選出一位成員。</p>", "p86": "<h3>手動分配</h3><p>指派人負責將任務分派給特定的處理人員；系統會將「把此步驟任務指派給某位參與者」的工作交給指派人執行。</p><ul><li>舉例來說，若您希望由某位部門主管接收所有相關任務，再自行決定應將任務分派給誰，這時就可以使用此模式。</li></ul>", "p87": "<h3>情境思考：分配模式</h3><p>您會怎麼做？在您組織的存取請求中，工作流程的步驟 3 應一律由特定團隊處理。</p><p>哪一種分配模式，能以最少的人工介入，公平地分配抵達此步驟的任務？</p><p>自分配、自動分配與手動分配，對於類型一致的請求非常實用；但有時適合的分配方式，取決於請求本身的內容。對於這類較複雜的請求，動態分配能提供所需的彈性。</p>", "p88": "<h3>動態分配總覽</h3><p>動態分配</p><p>SecureChange 提供「腳本化條件」與「腳本化任務」兩項功能，各自具備不同能力以強化分配的客製化與效率。腳本化條件從內建清單提供分配邏輯，腳本化任務則讓您自行建立分配邏輯。</p>", "p89": "<h3>動態分配情境範例</h3><p>讓我們來看看這兩項分配功能可能派上用場的兩種情境：</p><p>依工單指派時段將步驟分配給群組：法蘭克福時間 6-18 點指派給法蘭克福 IT 群組，18 點至隔日 6 點指派給紐約 IT 群組。／依包含的目標數量將工單分配給群組：若目標超過 10 個，指派給群組 X。</p><p>腳本化條件提供簡單易用的預先定義條件，適合直觀明瞭的情境；腳本化任務則適合高度客製化的分配需求，讓使用者能透過自訂腳本實作更複雜的邏輯。</p>", "p90": "<h3>多群組工單處理</h3><p>若一張工單包含多筆會分派至不同群組的請求，負責處理的群組在開啟工單審查時，只會看到自己負責的那部分請求。</p>", "p91": "<h3>腳本化條件設定（一）</h3><p>「條件」讓使用者能依特定內建條件，建立動態的步驟分配規則。此功能可依來源、目的地或服務等預先定義的條件，簡單直接地自動判斷合適的處理人員，系統會據此動態分配任務，簡化流程。</p><p>在步驟的「指派」分頁中，選擇「動態分配」再選擇「條件清單」，即可設定用於建立平行任務與條件任務的條件；在每一列定義會產生任務的條件，並選擇對應方式。</p><p>每個步驟最多可新增 40 項任務。條件清單的最後一列用於定義預設任務，當工單中任何一筆存取請求不符合其他條件時，就會建立此任務；預設任務無法……</p><p>選擇「動態分配」與「條件清單」，接著點擊「新增任務」。</p>", "p92": "<h3>腳本化條件設定（二）</h3><p>在這個新的條件任務中，我們會定義一項或多項條件，用以決定何時產生此任務。條件可依存取請求或工單細節設定，包括任何預先定義的欄位（如核准／駁回）、SLA 或驗證狀態、自訂腳本，或以下可自訂欄位：核取方塊、下拉選單、文字區塊與文字欄位。</p><p>讓我們看看幾種您可能遇到的情境，以及如何運用條件來設定分配方式。</p>", "p93": "<h3>情境：略過步驟的條件</h3><p>您希望 SC 能依據風險分析或 Verifier 工具的結果，完全跳過某個步驟。條件可依存取請求或工單細節設定：存取請求方面包括目標、來源、目的地、服務等 AR 值；工單方面則包括風險狀態、Verifier 狀態、自訂欄位的值等各項要素。</p><ul><li>也可使用自訂腳本或以下可自訂欄位：核取方塊、下拉選單、文字區塊、文字欄位。若系統已確認「無風險」，或所請求的變更已經完成實作，您會希望 SC 完全跳過該步驟。</li></ul>", "p94": "<h3>條件設定示意</h3><p>本頁以畫面示例呈現工作流程步驟「指派」分頁中的分配模式下拉選單，列出自分配、手動分配、自動分配與動態分配四種選項，供管理者依步驟需求選擇合適的分配方式。</p>", "p95": "<h3>條件設定：自訂欄位</h3><p>您可以選取前一步驟的自訂欄位，例如核取方塊、下拉選單、文字區塊或文字欄位；前一步驟的欄位會依步驟名稱與欄位名稱列出。</p><p>可設定文字欄位或文字區塊是否包含指定文字、不包含指定文字，或是否與指定文字相符。</p><p>若為「目標」條件——點擊「目標」並從可用目標中選取。</p>", "p96": "<h3>條件設定：關係運算子</h3><p>點擊「IP」或「服務」可手動定義數值，或點擊「Obj」搜尋既有數值。來源、目的地與服務條件可用的關係包括：</p><ul><li>屬於：存取請求值全部包含於此處設定的值中。</li><li>不屬於：存取請求值完全不包含於此處設定的值中。</li><li>交集：存取請求值有部分包含於此處設定的值中。最後一項條件永遠是「若無其他條件相符」，以確保該任務一定會被處理。</li></ul>", "p97": "<h3>新增條件與分配模式</h3><p>使用「+」按鈕新增條件；若條件超過一項，可用「且／或」下拉選單定義條件之間的關係。</p><p>設定好條件後，即可選擇三種分配模式之一：自分配、自動分配或手動分配。</p>", "p98": "<h3>腳本化任務總覽</h3><p>另一方面，腳本化任務提供更進階的客製化層級。此功能讓使用者能運用自訂腳本，以動態方式決定步驟分配；透過 JavaScript 等腳本語言，使用者可實作複雜的邏輯，並與外部系統、API 或資料庫整合。這種彈性確保分配方式能精準貼合複雜的業務需求，讓使用者對整個分配流程擁有完全的掌控權。</p><p>若動態分配情境需要許多條件，或需依賴外部系統的資訊，可使用自訂腳本來定義動態分配的條件。</p>", "p99": "<h3>腳本化任務：腳本內容</h3><p>此腳本會從 SecureChange 接收工單 ID。在腳本中，舉例來說您可以：</p><ul><li>執行 REST API 呼叫至 SecureChange 以蒐集資訊</li></ul><p>○ self（自分配）——任務會顯示給所有參與者，任一參與者皆可承接成為處理人員。</p><p>○ manual（手動分配）——由指定的指派人將任務分配給特定處理人員，此模式須填寫 assigner_username 欄位。</p>", "p100": "<h3>腳本化任務設定步驟（一）</h3><p>1. 選擇「動態分配」與「腳本化任務」。</p><p>Tufin 知識庫網站 ⇨ 運用腳本強化工作流程</p>", "p101": "<h3>腳本化任務設定步驟（二）</h3><p>3. 點擊「測試」以確認 SC 能以正確權限存取該腳本，且腳本能回傳格式正確的 XML 回應。測試時會以「test」做為唯一參數呼叫該腳本；若要通過測試，XML 回應格式須為：&lt;tasks&gt;&lt;/tasks&gt;</p><p>4. 如前所述，設定預設任務的名稱、參與者與……</p><ul><li>腳本必須回傳格式為 XML 的任務清單給 SecureChange，列出該步驟要建立的任務及各任務的分配模式；回應中未指定的存取請求，將由預設任務處理。</li></ul><ul><li>該腳本必須設有 root 使用者可讀取與執行的權限。</li><li>當工單進入此步驟時，傳送給腳本的第一個（也是唯一一個）參數即為工單 ID。</li></ul>", "p102": "<h3>腳本化任務設定連結</h3><p>Tufin 知識庫網站：為存取請求設定動態分配自訂腳本</p>", "p103": "<h3>存取請求</h3><p>第 10 堂課</p>", "p104": "<h3>存取請求工作流程步驟</h3><p>存取請求工作流程的步驟與設定可能因情境而異，但我們將以包含四個步驟的情境為例：提交、審批、設計與實作，以及驗證。</p>", "p105": "<h3>存取請求流程總覽</h3><p>使用者提交請求，並指定來源、目的地與服務。</p><p>審批處理人員接著可運用風險分析工具，判斷該請求是否違反統一安全政策（USP）的設定，再據以核准或駁回請求。</p><p>下一位處理人員開始進行設計與實作：運用目標建議工具取得詳細的路徑分析資訊，並使用 Designer 工具找出 SecureChange 針對此變更所提出的建議修改。</p><p>在最後一個步驟中，處理人員可使用 Verifier 工具，確認變更是否已成功落實，或政策是否仍在更新中。</p>", "p106": "<h3>案例角色介紹</h3><p>現在讓我們透過三位角色的視角，看看這個流程在 SecureChange 中實際的樣貌：</p><p>John Smith——請求者</p><p>Robin Green——審批者</p><p>Henry Carr——設計者</p>", "p107": "<h3>請求者提出需求</h3><p>「我們網路要新增一台伺服器，因此我需要讓來源 200.0.54.12/32 能透過 SNMP 存取 10.1.1.202/32。」</p><p>——John Smith</p>", "p108": "<h3>請求者操作：開始</h3><p>開始</p>", "p109": "<h3>填寫工單表單</h3><p>工單表單能讓我填入請求的關鍵細節。</p><p>下方的存取請求欄位，能讓我詳細說明想要開放的存取內容。</p>", "p110": "<h3>填寫工單表單（續）</h3><p>本頁延續工單填寫畫面，呈現存取請求欄位中新增第二、三筆請求的操作方式，各筆請求皆可獨立填寫來源、目的地與服務內容。</p>", "p111": "<h3>多筆存取請求</h3><p>在我的工單中，並不限於只能填寫一筆存取請求；我發現在這個流程中，其實需要提出多筆存取請求，才能完成我想做的事。</p>", "p112": "<h3>備註欄位使用</h3><p>針對每一筆存取請求，我都可以使用備註欄位，記錄需要開放此存取權限的原因。</p>", "p113": "<h3>業務理由與提交</h3><p>在「業務理由」欄位中，我也會填寫提出這些請求的整體原因；一切就緒後，我會點擊「提交」，將工單交給正確的人員處理。</p>", "p114": "<h3>審批者角色</h3><p>審批</p><p>「在我們組織中，我是負責工單的第一位處理人員——是否讓 John 的請求繼續交由下一位人員處理，由我來決定。我知道 SecureChange 能提供有助於我快速做出判斷的資訊。」</p><p>——Robin Green</p>", "p115": "<h3>審批者操作：開始</h3><p>開始</p><p>在我們組織中，所有存取請求會自動指派給我進行初步審批。因此當 John 提交請求後，我會在「任務」頁籤的任務清單中找到它；由於這是我收到的最新請求，會顯示在清單最上方。我會點擊主旨以檢視他的工單。</p>", "p116": "<h3>檢視工單內容</h3><p>開啟 John 的工單後，我可以在畫面上方看到工作流程已進入步驟 2「業務審批」，下方則列出 John 提出的每一筆請求。</p>", "p117": "<h3>執行風險分析</h3><p>我可以開始判斷這些請求是否應予核准。SecureChange 的風險分析按鈕會一次針對所有請求執行分析，並與我們現有的政策進行比對；執行完成後，會在每筆請求旁顯示綠色或紅色的指示燈號。</p><p>由於工單上沒有列出目標裝置，我會將其保留為「Any」。</p><p>不過，我也可以使用「進階選項」選單來選擇目標；SecureChange 會開啟一個視窗，帶入我的 SecureTrack 拓撲資訊，讓我瀏覽或搜尋我的網路。</p>", "p118": "<h3>發現風險違規</h3><p>由於 SecureChange 已依我們的 USP 比對過此請求的流量，我可以看到 John 想使用的 http 服務其實已違反政策。</p><p>如果我認為合適，也可以在視窗底部的「忽略風險」欄位中填寫理由，手動忽略此風險；不過我認為不應該忽略。因此我會點擊工單主旨返回……</p>", "p119": "<h3>核准並轉交下一步</h3><p>我會核准這項請求，讓它進入下一步；但我想確保下一位……</p><p>因此我會點擊「核准」，並在原因欄位中填寫補充說明，最後點擊「完成」以送交下一位處理人員。</p>", "p120": "<h3>設計者角色</h3><p>「身為負責設計存取請求的處理人員，我可以憑藉自己對網路的了解，並參考 Robin 的備註來調整 John 最初的請求；不過 SecureChange 能取得 SecureTrack 中所有網路與資安資訊，提出更周全的建議。」</p><p>——Henry Carr</p>", "p121": "<h3>設計者操作：開始</h3><p>開始</p><p>如同 Robin 會自動收到所有待審批的初始請求，我們的 SecureChange 設定也會將進入「設計與實作」步驟的工單自動指派給我。</p>", "p122": "<h3>修改服務解決風險</h3><p>工單目前開啟於步驟 3「設計與實作」。我可以將第二筆存取請求中有問題的服務，修改為 https；再次執行風險分析後，可以看到這已不再違反 USP。</p>", "p123": "<h3>使用進階選項選擇目標</h3><p>我看到 John 將目標保留為「ANY」。</p><p>若我使用每筆請求左側的「進階選項」，SC 能依其從 ST 取得的拓撲資訊，提供建議的目標裝置。</p><p>在這個案例中，SC 針對每筆請求各自建議了適合其請求流量的裝置；我只需點擊「新增」，即可將該裝置更新到目標欄位。</p>", "p124": "<h3>執行 Designer</h3><p>現在我可以執行 Designer，查看系統對規則與物件所提出的建議變更。</p>", "p125": "<h3>檢視 Designer 建議</h3><p>舉例來說，我可以看到系統針對 AR1 與 Fortinet 裝置提出的建議：</p><p>以新的網路物件建立一條新規則，做為政策中的最後一條規則。若我願意，可以為此規則命名，並調整其在政策中的位置；我打算將名稱改為「行銷活動規則」，但會保留 Designer 建議的位置。</p><p>Designer 也建議針對此規則記錄命中日誌，這點我同樣可以調整。點擊「檢視規則」，即可預覽新規則的樣貌。接著我會點擊「更新裝置」；裝置政策更新完成後，再點擊「提交」，將變更從管理主控台裝置推送至其子裝置。</p>", "p126": "<h3>更新裝置並完成步驟</h3><p>完成所有裝置的更新後，我可以關閉 Designer，並點擊「完成」結束此步驟。</p>", "p127": "<h3>工單推進至下一步</h3><p>在此案例中，請求已進入下一個步驟；但在這個組織中，Henry Carr 同時也負責這個步驟。我們會延續以 Henry 的身分，重新從他的「任務」清單開啟工單——每當工單推進到下一步，都會送往對應的任務佇列，因此即使 Henry 仍是負責人，他仍須回到任務清單，才能取回現在已進入步驟 4 的工單。</p>", "p128": "<h3>驗證者操作：開始</h3><p>開始</p><p>我可以看到 Verifier 指示燈號在三筆請求上皆顯示綠色，確認它們都已成功落實於相關政策中。</p>", "p129": "<h3>Verifier 比對時機</h3><p>Verifier 會依 SecureTrack 中收到的最新政策版本進行比對，以確認請求是否……</p><p>更新政策後，建議稍等幾分鐘再執行 Verifier，讓 SecureTrack 有足夠時間……</p>", "p130": "<h3>切換檢視 Verifier 結果</h3><p>我也可以透過這個下拉選單，切換檢視每筆存取請求各自的 Verifier 結果；若某筆請求未能成功落實於相關裝置政策中，這裡同樣會顯示出來，讓我能運用 Verifier 的結果協助排解問題。</p><p>接下來，我們將深入探討 SecureChange 工作流程中可用的各項工具。</p>", "p131": "<h3>風險分析</h3><p>第 11 堂課</p><p>風險分析工具會自動為涉及存取請求欄位的任務取得風險資訊，透過比對請求的來源、目的地與服務／應用程式，與 SecureTrack 中設定的 USP，評估該請求的安全性與合規性。</p><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>依 Tufin 官方說明，SecureChange+ 的風險分析不僅比對統一安全政策（USP），也能將政策智慧與弱點資料一併納入變更流程考量，協助團隊及早發現風險，並針對是否核准、駁回或調整請求，提供依風險門檻設定的建議選項。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>依 Tufin 官方說明，SecureChange+ 的風險分析不僅比對統一安全政策（USP），也能將政策智慧與弱點資料一併納入變更流程考量，協助團隊及早發現風險，並針對是否核准、駁回或調整請求，提供依風險門檻設定的建議選項。</p></div>", "p132": "<h3>風險分析類型</h3><p>風險分析僅在工作流程設定中，針對特定步驟啟用時才可使用。共有兩種類型：</p><p>外部風險分析：依第三方工具計算結果。</p><p>統一安全政策：SC 會將存取請求的流量與 ST 區域進行交叉比對。「網際網路」區域的定義，是指所有未被歸類於其他 ST 區域的 IP 位址。（違反 USP 的規則屬性不會納入風險分析，也不會被列為違規項目。）</p><p>Tufin 知識庫網站 ⇨ 設定第三方風險分析。若要在步驟中執行此工具，可點擊存取請求欄位中的「風險分析」按鈕；目標建議與風險分析也可設定為自動步驟執行，並將結果提供給下一步驟的處理人員參考。</p>", "p133": "<h3>風險燈號結果</h3><p>「風險」按鈕會顯示工具的執行結果，依風險分析工具的判定結果，共有三種顏色代碼可能結果：</p><p>若風險燈號為紅色，點擊該指示燈號即可查看更多……</p>", "p134": "<h3>風險等級與攻擊面</h3><p>所呈現的風險等級與潛在攻擊面，會受存取請求中所包含內容的影響；請求中定義的流量愈明確具體，潛在的攻擊面就愈小。</p>", "p135": "<h3>Palo Alto 應用程式身分風險判定</h3><p>目標為 Palo Alto 裝置，且包含應用程式身分。</p><p>若 USP 中包含該應用程式群組本身或其成員，風險分析會將請求中的應用程式群組成員視為無風險。</p><p>若 USP 中僅指定了應用程式而未指定服務，而請求中僅指定了該應用程式的服務而未指定應用程式（或反之），則會被視為存在風險。</p>", "p136": "<h3>處理風險的操作方式</h3><p>點擊「完成」按鈕：風險燈號仍會維持紅色，但工作流程會繼續進入下一步。</p><p>使用「管理任務」下拉選單可以「駁回工單」，系統會在關閉工單前提示輸入原因。</p><p>在風險詳情中，您可以在視窗底部輸入說明，再點擊「忽略」按鈕。</p><p>回到請求視窗後，風險燈號會變為綠色並附加星號，標示此風險為人工忽略。</p>", "p137": "<h3>拓撲與自動目標建議</h3><p>若想複習 USP 及其功能，可參閱 TCSE 1「區域與 USP」單元。</p><p>在啟用此選項的存取請求工作流程中，SecureChange 會運用 SecureTrack 的拓撲與政策資訊，分析請求中來源與目的地之間可能的流量路徑，並自動將相關的目標裝置加入該存取請求。稍後您將看到實際示範，下一段影片也會更深入說明 SecureChange 處理存取請求時的拓撲與路由層面。</p><p>讓我們以一張包含兩筆存取請求的工單為例。</p>", "p138": "<h3>自動化風險分析與目標選取</h3><p>自動化風險分析（與目標選取）</p><p>共有兩筆請求——AR1 與 AR2。</p>", "p139": "<h3>案例：AR1／AR2 風險比較</h3><p>在 AR1 中，SC 並未偵測到任何風險，並建議了 R80-Training 這台目標裝置，同時自動將其加入存取請求。</p><p>在 AR2 中，SC 偵測到風險，同時也提供了 5 台可能的目標裝置並加入請求中。</p><p>處理方式：在進行任何變更之前，我想先更清楚了解涉及哪些風險，以及 SC 針對這些請求提出了哪些建議變更。</p><p>我最關心的是第二筆請求中的風險。點擊風險指示燈號，即可查看已偵測到的風險詳情。</p><p>使用頁面上方的「初步檢查」連結，Verifier 可提供以下資訊：</p><ul><li>該路徑上裝置中，允許或阻擋此流量的政策規則。</li></ul>", "p140": "<h3>AR1 拓撲檢視</h3><p>這裡可以看到 AR1 的拓撲圖：指示燈號為綠色，因為此流量已經被實作，狀態欄位中也能看到相同資訊；同時也能看到允許此流量的裝置，以及政策版本的詳細資訊。</p>", "p141": "<h3>檢視允許流量的規則</h3><p>往下捲動後，我還能看到裝置政策中，允許此存取請求流量通過的具體規則。</p>", "p142": "<h3>AR2 拓撲檢視</h3><p>當我在下拉選單中選擇 AR2 時，可以看到流量通過各目標裝置的路徑，以及各裝置政策中的相關規則。</p>", "p143": "<h3>拓撲路徑分析示意</h3><p>本頁為本段案例的總結畫面，彙整目標建議、風險分析與拓撲路徑檢視三項功能，如何協助處理人員在核准與設計存取請求前，快速掌握每筆請求目前的實作狀態與潛在風險。</p>", "p144": "<h3>第三方風險分析工具</h3><p>這裡可以看到其中一台裝置上的流量已經被實作；點擊裝置即可查看目前允許或阻擋該流量的規則。接著我可以回到工單，依需要調整清單內容，再執行 Designer 設計變更，並將政策更新至相關裝置。值得留意的是，如同目標建議與風險分析一樣，工作流程中的自動步驟同樣可設定為自動執行 Designer、供應配置、提交與 Verifier。</p><p>您也可以使用第三方工具來判定風險，但必須串接一支腳本，做為 SC 與外部風險評估工具之間的中介。如需了解更多，請參閱我們的……</p><p>Tufin 知識庫網站：設定第三方風險分析</p>", "p145": "<h3>Designer 設計工具</h3><p>第 12 堂課</p><p>為了更清楚了解 Designer 的運作方式及其對存取請求的影響，讓我們檢視一個具體案例。</p><p>首先，我們將探討負責核准或駁回請求的處理人員，如何運用可用的工具來核准並註記該請求。</p><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>依 Tufin R25-2 官方文件，Designer 的建議結果是根據特定政策版本（Revision）產生；當政策有新版本時，先前產生的建議可能受影響。若偵測到如物件名稱衝突等實際衝突，Designer 會要求重新設計；但需留意當多位處理者同時透過動態指派編輯同一裝置時，系統並不支援衝突偵測。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>依 Tufin R25-2 官方文件，Designer 的建議結果是根據特定政策版本（Revision）產生；當政策有新版本時，先前產生的建議可能受影響。若偵測到如物件名稱衝突等實際衝突，Designer 會要求重新設計；但需留意當多位處理者同時透過動態指派編輯同一裝置時，系統並不支援衝突偵測。</p></div>", "p146": "<h3>檢視審批意見</h3><p>檢視工單，並點擊閃爍的圓點，查看審批者的意見。</p>", "p147": "<h3>多筆存取請求範例</h3><p>單一工單並不限於只能包含一筆存取請求，可包含多筆請求。</p><p>這些請求也不侷限於單一的來源、目的地或服務，每筆請求都能反映各自獨特的存取需求。</p><p>在此案例中，我們的這張工單包含了 3 筆存取請求……</p><p>在填寫來源 IP、目的地 IP 與服務時，您可以選擇以自由文字輸入；若已選定目標裝置，也可以使用「進階選項」選單搜尋既有物件。</p>", "p148": "<h3>步驟 2 風險分析結果</h3><p>在此工作流程的步驟 2 中，處理人員被賦予使用風險分析工具的權限。在這張工單中，雖然請求 1 與請求 3 皆無風險，但請求 2 有風險；點擊紅色風險指示燈號可查看更多詳情——在此案例中，http 服務違反了 USP 的規範。</p>", "p149": "<h3>風險處理：繼續</h3><p>風險——繼續處理</p>", "p150": "<h3>核准並附註風險</h3><p>核准，並附上備註</p><p>由於這位處理人員的任務只是單純核准或駁回所包含的請求，他們不會嘗試自行解決已發現的風險。</p><p>取而代之，他們可以註記：雖然請求已核准，但流程中確實發現了特定風險。</p>", "p151": "<h3>設計者面臨的情況</h3><p>現在，輪到負責設計這項已核准請求的處理人員，面對以下情況：</p><p>解決流程中先前發現的問題</p><p>指派目標裝置（我可以看到原始請求者並未指定任何目標）</p><p>評估這些存取變更將如何影響網路</p><p>讓我們觀察 Designer 如何找出潛在問題，並提出建議的解決方案；我們將檢視 Designer 的分析結果，如何在引導處理人員的行動與決策上發揮關鍵作用。</p><p>我們將著重說明 Designer 在找出問題並提供可執行建議方面的成效；透過追蹤這張工單的處理歷程，我們能深入了解……</p>", "p152": "<h3>重新執行風險分析</h3><p>根據前一位處理人員的備註，第二筆請求似乎因為 http 服務違反 USP 設定而存在風險。</p><p>由於風險分析工具在此步驟中仍可使用，我們可以進行修改並重新執行該工具，判斷此問題是否能被解決或降低。</p><p>透過修改第二筆請求中的服務，先前發現的風險即可獲得……</p>", "p153": "<h3>指定目標裝置</h3><p>由於目標目前設為「ANY」，我們需要指定一台具體裝置。前往「進階選項」選單，即可找到「+新增目標」的選項；目標選取共有兩種方式：</p><p>自動在來源與目的地之間，找出合適的目標裝置……</p>", "p154": "<h3>目標建議工具運用</h3><p>透過為每筆請求使用目標建議功能，SC 能為每條路徑各自找出對應的裝置。</p>", "p155": "<h3>Designer 建議邏輯</h3><p>Designer 會依特定的工作流程類型，建議處理此工單所需的變更。</p><p>對於存取請求工作流程，Designer 會針對物件、規則及其他實作所請求存取權限所需的修改，提出建議。Designer 僅會針對已指定目標的請求執行，這也是為什麼我們不能讓請求維持原本提交時「ANY」的目標設定。</p>", "p156": "<h3>Designer 建議依據</h3><p>那麼 Designer 在提出建議時，遵循的是什麼樣的邏輯？</p><ul><li>網際網路物件：Designer 會使用目標裝置的網際網路物件，代表 TOS 功能中所有 IPv4 位址所組成的網際網路。</li></ul><ul><li>規則：Designer 會將請求與現有的拓撲及安全政策進行比對。預設情況下，Designer 會嘗試優化既有規則的重複使用，以避免因重複或不必要的規則而造成政策膨脹。</li></ul><p>應用程式身分：Designer 會考量與該應用程式身分相關聯的服務；在規則中設計新群組時，Designer 會使其與 SecureApp 中指定的定義保持一致。</p>", "p157": "<h3>除役與複製情境建議</h3><p>建議應如何修改特定規則，將該伺服器從中移除；該物件本身仍會保留，但 Designer 能就如何移除其關聯提出建議。</p><p>若某條規則在伺服器除役後將不再具有意義，則建議完全移除該規則。</p><p>舉例來說，若被複製的伺服器已在某規則中被引用，複製後的伺服器同樣需要……</p><p>列出應加入或移出群組的物件，或應建立的新群組……</p>", "p158": "<h3>規則除役建議</h3><p>建議應如何修改規則庫，以便將某條規則除役。</p><p>若想進一步了解 SecureChange 如何支援各廠牌裝置，歡迎查閱我們的知識庫。</p><p>Tufin 知識庫網站：各廠牌的 SecureChange 功能支援</p>", "p159": "<h3>進階設計工具</h3><p>第 13 堂課</p>", "p160": "<h3>Designer 建議考量因素</h3><p>Designer 在提出建議時，會運用並考量以下項目：</p><p>拓撲、實作邏輯、群組處理、舊版規則、隱形規則</p>", "p161": "<h3>拓撲模式說明</h3><p>拓撲：Aurora 平台的一項關鍵特色，是 SecureChange 與 SecureTrack 之間的深度整合。Designer 能運用 SecureTrack 的拓撲資訊，做為工作流程中提出建議的基礎，共有兩種運作模式：</p><p>拓撲——啟用：啟用時，SecureChange 會運用拓撲功能，找出與存取請求相關的裝置與子政策，讓 Designer 得以建議政策變更並套用至這些裝置；在 NAT 環境中，計算時也會將 NAT 轉換納入考量。</p><p>拓撲——停用（非拓撲模式）：停用時，須手動選擇相關的裝置與子政策，並指定正確的 IP 位址，Designer 會依這些選擇來計算規則變更。為何要使用非拓撲模式？若您的拓撲地圖尚未完整建置，Designer 可能會提供不正確的結果；手動選擇涉及的裝置與政策，能提高成功的機會。</p>", "p162": "<h3>實作邏輯判斷流程</h3><p>實作邏輯：在拓撲模式下，Designer 會依以下邏輯順序，判斷流量是否已經被實作：</p><p>① 執行拓撲分析——Designer 會執行拓撲功能，為每台裝置的「進」「出」介面建立目標建議，以繞送相關流量；此步驟僅針對工單中所請求的流量，不多也不少。</p><p>② 分析——Designer 接著會分析相關裝置的政策，計算每台目標裝置缺少哪些流量。</p><p>③A 回傳結果——完整實作的流量：若流量已完整實作，則不會進行任何變更，Designer 會回傳提示訊息告知使用者。</p><p>③B 回傳結果——未完整實作的流量：若流量尚未完整實作，Designer 會在政策中搜尋可修改以實作此存取請求的相關規則；若找到多條規則，Designer 會建議修改其中較為寬鬆的一條。</p>", "p163": "<h3>案例導入</h3><p>案例說明</p><p>讓我們追蹤這張存取請求工單的處理歷程，了解 Designer 如何處理並提出建議。</p><p>拓撲：我們的工單已包含明確的目標（R80-Training），因此 Designer 可以直接跳到分析階段並提出建議。</p>", "p164": "<h3>分析階段</h3><p>分析</p><p>當 Designer 取得目標裝置的政策後，能計算出這兩筆請求缺少哪些存取權限，並嘗試尋找可修改的規則。若某條規則的三項欄位（來源、目的地、服務）中有兩項與存取請求相同，Designer 就會建議修改該規則。</p>", "p165": "<h3>AR1 分析結果</h3><p>分析——AR1</p><p>以 AR1 為例，規則 1 的來源與目的地相同，規則 2 與 3 則是目的地與服務相同；因此 Designer 會建議修改這些規則，以實作 AR1 的請求。</p>", "p166": "<h3>AR2 分析結果</h3><p>分析——AR2</p><p>然而對於 AR2，無法進行修改：沒有任何規則的來源、目的地、服務三項條件中有兩項達到門檻相符，因此 Designer 會建議建立一條新規則來實作 AR2。</p>", "p167": "<h3>建議邏輯總結</h3><p>總結</p><p>若請求的來源、目的地、服務三項條件中有兩項與規則相符，Designer 會建議修改既有規則；若都不相符，則建議建立新規則。</p>", "p168": "<h3>分流路徑處理</h3><p>分流路徑流量繞送</p><p>Designer 也能將存取請求的流量拆分為多條路徑，僅建議在每個政策中新增相對缺少的流量。在某些分流情境中，存取請求的目的地欄位可能包含兩個 IP 位址，但 Designer 會選擇修改僅包含其中一個 IP 位址的規則；這是刻意的設計，因為我們只希望在政策中允許已被繞送的流量。</p>", "p169": "<h3>請求關聯機制</h3><p>請求關聯</p><p>為提升效率，Designer 能將存取請求彼此關聯。在一張工單中，若兩筆存取請求包含完全相同的路徑請求（如本例），Designer 會（視需要）針對第一筆請求提出建議；至於第二筆請求，處理完成後，Designer 會顯示該請求已完整實作——因為所有必要的變更，其實已經在處理第一筆請求時一併完成了。</p>", "p170": "<h3>多請求規則整合</h3><p>在另一張工單中，我們可以看到這三筆請求的來源雖然不同，但目的地與所使用的服務皆相同；由於三項條件中有兩項相符，Designer 會將所有指向同一規則的存取請求整合，並提供單一……</p>", "p171": "<h3>群組處理原則</h3><p>群組處理：Designer 在處理網路物件群組時，有幾項關鍵差異：</p>", "p172": "<h3>群組編輯條件與例外</h3><p>群組編輯：雖然 Designer 不會建議建立新群組，但在特定條件下會建議編輯既有群組：</p><ul><li>該群組被用於所有 Designer 建議修改的規則中</li><li>該群組未被用於任何與此存取請求無關的其他政策規則</li></ul><p>此外也有一些例外情況，例如：</p><ul><li>若工單來自 SAPP（或 Cisco ASA／路由器），Designer 會建議建立新群組</li><li>對於 Panorama 與 FMC，Designer 僅會編輯來自葉層裝置群組／網域的群組</li><li>若群組無法變更，流量變更將直接實作於規則中</li></ul><p>牢記這些規則與例外後，下方讓您測試自己是否能像 Designer 一樣思考。</p>", "p173": "<h3>案例：group1 判斷（一）</h3><p>這是一張 Cisco ASAv 裝置的存取請求，圖中為目前的政策內容。您認為 Designer 會建議編輯「group1」嗎？</p>", "p174": "<h3>group1 政策示意</h3><p>本頁呈現 Cisco ASAv 裝置目前的政策規則表，列出各規則的來源、目的地、服務與動作，其中 group1 做為物件出現在多條規則的來源或目的地欄位中；讀者可依此規則表判斷 group1 是否僅用於與此存取請求相關的規則，做為下一頁解答的依據。</p>", "p175": "<h3>解答：不建議編輯</h3><p>由於 group1 也被用於與此存取請求無關的其他規則中，因此 Designer 不會建議編輯該群組。</p>", "p176": "<h3>案例：group1 判斷（二）</h3><p>現在我們有兩筆存取請求，第二筆請求的目的地已經變更。您認為 Designer 現在會建議編輯 group1 嗎？</p>", "p177": "<h3>解答：建議編輯</h3><p>在這種情況下，Designer 會建議編輯 group1：因為 group1 被用於所有 Designer 建議修改的規則中，且未被用於任何與此存取請求無關的其他政策規則。</p>", "p178": "<h3>舊版規則處理</h3><p>舊版規則</p><p>在 SecureTrack 中，規則可被標記為舊版規則。若舊版規則的流量與請求流量有交集，Designer 會忽略該舊版規則的流量，並僅建議在政策中此舊版規則之上的位置進行變更。</p>", "p179": "<h3>舊版規則使用時機</h3><p>為什麼？這麼做有助於您逐步移除過於寬鬆的規則：先將規則標記為舊版，開始只實作真正需要的流量；隨著持續新增流量，該舊版規則在政策中的排序會逐漸下降。持續進行下去，舊版規則最終應不再有任何命中記錄，屆時便可將其刪除。此方法在政策中此類規則不超過 2 至 3 條時效果最佳。</p>", "p180": "<h3>案例：與舊版規則交集</h3><p>此存取請求會與 Rule1234 產生交集。一般情況下，Designer 會提示該請求的流量已經被實作——因為請求中的來源 IP 屬於該規則來源子網路的一部分，且目的地與服務也相同；然而，這是一條舊版規則。</p>", "p181": "<h3>解答：新增規則於前</h3><p>因此，Designer 會建議在 Rule1234 之前新增一條規則。</p>", "p182": "<h3>隱形規則處理</h3><p>隱形規則</p><p>在 SecureTrack 中，規則也可被標記為隱形規則。此時 Designer 會建議在政策中此隱形規則之下的位置進行變更；隱形規則會阻止 Designer 建議在其上方建立規則，避免規則遭到遮蔽。</p>", "p183": "<h3>隱形規則使用原因</h3><p>為什麼？隱形規則可用來保護防火牆裝置免受攻擊，方式是拒絕對特定防火牆本身的非必要存取。隱形區段一律位於裝置政策的最上方，由所有位於（並包含）最後一條被標記為隱形的規則以上的規則所組成。</p><p>此存取請求會與規則 4（一條動作為「捨棄」的隱形規則）產生交集；一般情況下，Designer 會建議在規則 4 上方新增規則以實作此存取。</p>", "p184": "<h3>案例：隱形規則建議</h3><p>然而，由於規則 4 是隱形規則，Designer 會提出如下建議：在隱形區段下方新增規則。在此案例中，該位置會落在政策底部，緊鄰規則 35（一條清理規則，用於阻擋所有其他規則皆未允許的流量）之前。</p>", "p185": "<h3>供應配置</h3><p>第 14 堂課</p><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 知識庫指出，Provisioning（供應配置）會依裝置的政策優化設定運作，分為「Inline Designer」（建議直接顯示於工單中）與「OPM Designer」（需點擊以開啟詳細結果頁面）兩種呈現模式；系統也允許在落實前，依裝置與政策情境自訂建議內容，例如規則位置、物件選擇、規則命名或註解等。</p></div><div class=\"kc-box\"><div class=\"kc-label\">Tufin R25-2 官方知識庫補充說明</div><p>R25-2 知識庫指出，Provisioning（供應配置）會依裝置的政策優化設定運作，分為「Inline Designer」（建議直接顯示於工單中）與「OPM Designer」（需點擊以開啟詳細結果頁面）兩種呈現模式；系統也允許在落實前，依裝置與政策情境自訂建議內容，例如規則位置、物件選擇、規則命名或註解等。</p></div>", "p186": "<h3>Designer 建議與供應配置</h3><p>Designer 靈活運用拓撲與 SecureTrack 中現行的規則庫資料，針對修改政策提出建議；這些量身打造的建議能協助目標裝置的網路安全政策順暢地落實所請求的變更，讓您能針對支援的裝置，將政策調整從管理主控台裝置提交至個別防火牆。不過，使用 Designer 時有幾項要點須謹記：</p><ul><li>在處理存取請求的初始步驟（稱為「開啟請求」步驟）中，推送變更的功能會受到限制</li><li>請求者角色不具備執行所請求變更的權限</li><li>當一張工單涉及多個目標時，供應配置會依處理人員的請求，針對每個目標逐一進行。</li></ul>", "p187": "<h3>TOS 如何變更裝置設定</h3><p>TOS 如何對您的裝置進行變更？在 TOS 中，供應配置是指使用 Designer 將建議的政策變更，直接儲存至單一裝置；該裝置可以是防火牆裝置、安全群組，或管理主控台裝置。</p>", "p188": "<h3>管理裝置與防火牆裝置差異</h3><p>對於管理主控台裝置，變更不會被推送至該主控台所管理的子防火牆裝置，修改後的政策僅保留在主控台裝置本身。對於防火牆裝置或安全群組，變更會在完成供應配置後立即生效並被強制執行。更新後的政策不會生效並強制套用至所有子防火牆裝置，除非所有變更都經過明確提交（部分裝置廠牌稱為推送或安裝）。</p>", "p189": "<h3>提交變更定義</h3><p>在 TOS 中，提交變更是指將管理主控台裝置目前的一整套安全政策，推送至該主控台所管理的所有子防火牆裝置；SecureChange 中的提交變更功能，僅適用於支援「SecureChange 供應配置＋提交」功能的管理裝置。</p><p>在 Designer 內，您可以點擊「提交」，立即供應配置並提交政策變更；此外，也可透過設定排程的變更視窗（本課程稍後會說明），讓供應配置自動進行。</p>", "p190": "<h3>提交政策的意義</h3><p>提交政策代表啟用並強制執行更新後的政策規則，此步驟確保修改後的規則確實套用於網路的實際運作環境中。</p>", "p191": "<h3>供應配置運作方式</h3><p>供應配置如何運作？當使用者執行「更新裝置」指令時，SecureChange 會在幕後與相關裝置溝通以更新其政策，並將更新結果呈現給使用者。更新政策涉及對政策規則進行修改，例如新增規則、修改既有規則，或刪除已過時的規則；在更新階段，變更尚未被強制執行，讓管理者能在落實前先行審查並微調。</p><p>在任一時間點，同一台裝置只能有一個供應配置流程在進行更新。若兩位使用者同時對同一台裝置觸發「更新裝置」流程，其中一位將會看到「裝置忙碌中」的錯誤訊息。</p>", "p192": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p193": "<h3>授權 Authorization</h3><p>第 15 堂課</p><p>Designer 提供的建議可被供應配置並提交至網路。而 SecureChange 與 SecureTrack 之間會持續溝通，透過授權流程，追蹤這些版本修訂與既有工單流量的對應關係及其對網路流量的影響。</p>", "p194": "<h3>授權判定流程</h3><p>更新後的裝置會產生新的版本修訂，並整合至 SecureTrack 中；SecureTrack 會監控存取請求的版本修訂，並依以下流程將其標記為「已授權」或「未授權」：</p><p>① 接收修訂——SecureTrack 從裝置接收新的版本修訂。</p><p>② 掃描工單——當政策變更允許了某項流量時，SecureTrack 會掃描是否有相符的 SecureChange 工單。</p><p>③ 連結工單——若找到相符的工單，會將其與該修訂連結，並顯示於變更圖表中。</p><p>④A 標記為已授權——若所有新允許的流量皆已與工單建立關聯，該修訂會被標記為已授權。</p><p>④B 標記為未授權——若並非所有新允許的流量都與工單建立關聯，該修訂會被標記為未授權。</p>", "p195": "<h3>授權狀態四種情形</h3><p>SecureTrack 會依授權狀態與是否有關聯工單，標記存取修訂請求：若該修訂未帶來任何新允許的流量，或其變更不影響網路流量，SecureTrack 會將其標記為「已授權（無工單）」。若所有新允許的流量皆符合至少一張相關的 SecureChange 存取請求類型工單，則標記為「已授權（有工單）」。若有存取請求工單與該修訂連結，但並非所有流量皆對應到 SecureChange 工單，則標記為「未授權（有工單）」。若該修訂中新允許的流量完全沒有對應的存取請求工單，則標記為「未授權（無工單）」。</p>", "p196": "<h3>工單關聯條件</h3><p>工單如何被建立關聯？SecureTrack 會在符合以下所有條件時，自動將 SecureChange 存取請求工單與某次修訂建立關聯：</p><ul><li>該工單包含的存取請求，其允許的流量與新允許的流量部分相符</li><li>該存取請求工單的目標，與收到修訂的裝置相同，或設為「Any」</li><li>該 SecureChange 工單目前為開啟狀態，或於過去 3、6、9 或 12 個月內關閉</li><li>該存取請求工單已獲授權，意即其至少有一個步驟包含核准／駁回欄位（且最終步驟為已核准），或即使沒有核准／駁回欄位，該工單也已到達工作流程的最後步驟。</li></ul><p>備註：您可以視需要手動變更授權狀態；提示訊息會顯示變更授權狀態的管理者姓名與變更時間，以利追蹤。</p>", "p197": "<h3>授權標記與變更控制</h3><p>SecureTrack 會自動將每次修訂標記為以下狀態之一：</p><p>無論請求是否與工單建立關聯，您仍然可以掌控變更何時生效、以何種方式生效。</p>", "p198": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p199": "<h3>提交與政策安裝選項</h3><p>第 16 堂課</p><p>當使用 Designer 將建議的政策變更儲存至單一裝置（防火牆裝置、安全群組或管理主控台裝置）時，即發生供應配置；但對管理主控台裝置而言，修改後的政策一開始僅保留在主控台裝置本身，除非手動提交變更，否則不會生效並推送至所有受管子防火牆裝置。</p>", "p200": "<h3>政策安裝的兩種方式</h3><p>Tufin 的政策安裝功能，讓網路管理者能透過管理主控台裝置，以兩種方式自動將政策變更提交至受管裝置：</p><p>隨選提交讓管理者能設定工作流程，允許相關工單處理人員在需要時立即執行自動政策提交。</p><p>排程提交則讓管理者能設定排程的變更視窗，Aurora 會在重複出現的預先定義時段中，自動提交所有待處理的政策變更。</p>", "p201": "<h3>更新裝置涵蓋範圍</h3><p>選擇「更新裝置」後，供應配置的變更會被安裝至安全群組、防火牆裝置與管理裝置；管理裝置可以是：Panorama 進階模式（包含任何層級的裝置群組）、FortiManager 進階模式、ADOM，以及 Check Point CMA R80。</p>", "p202": "<h3>推送修訂至子裝置</h3><p>接著，版本修訂變更即可從管理裝置推送至受管的子裝置；供應配置的變更成功更新至管理裝置後，我們便能將更新後的政策推送至子裝置。</p>", "p203": "<h3>執行提交按鈕</h3><p>若要將政策變更從管理裝置提交至所有受管的子防火牆裝置，可點擊「提交」按鈕；此按鈕僅在變更已成功供應配置至管理裝置後才會啟用。所有已儲存至管理裝置的變更（包括並非由目前處理中工單所發起的變更）都會一併提交至子裝置。</p>", "p204": "<h3>提交結果三種狀態</h3><p>提交流程完成後，SecureChange 會回傳以下三種狀態結果之一：</p><p>所有政策變更皆已成功提交至相關子裝置，並提供摘要報告。</p><p>政策未能成功提交至相關子裝置，摘要報告中包含所有錯誤與警告。</p><p>提交流程未開始、未被觸發，不會產生摘要報告。</p>", "p205": "<h3>提交所需時間</h3><p>視所需變更數量而定，提交流程可能需要數分鐘，若網路規模非常龐大，甚至可能長達數小時；預設逾時設定為六小時，超過此時間後提交流程將會停止，須重新執行。</p>", "p206": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p207": "<h3>變更視窗</h3><p>第 17 堂課</p><p>變更視窗可將 SecureChange 中設計完成的變更，自動提交至受管防火牆，並可於 SecureTrack 中建立與管理；您可以彙整並自動管理裝置政策變更、將視窗排程於非上班時段執行，並即時監控政策提交流程的成功或失敗狀態。</p>", "p208": "<h3>變更視窗運作範圍</h3><p>雖然許多變更是在 SecureChange 中設計完成，但變更視窗會將所有變更提交至受管防火牆，無論該請求是否來自 SecureChange。變更視窗執行期間，Aurora 會自動將相關防火牆上已儲存政策的最新版本提交生效。每個視窗皆可針對多台裝置設定，同一台裝置也可被設定於多個變更視窗中。</p>", "p209": "<h3>變更視窗功能與支援系統</h3><p>變更視窗可讓您：（可設定於多個變更視窗中）</p><ul><li>彙整管理裝置的網路政策變更並自動提交</li><li>將提交作業排程至非上班時段執行</li><li>即時監控目前、下一次與上一次政策提交流程的成功或失敗狀態。運作方式為何？以下管理系統／裝置支援自動政策提交：</li><li>Panorama 進階模式（包含任何層級的裝置群組）</li><li>FortiManager 進階模式（ADOM）</li><li>Check Point R80.x CMA 與 MDS 裝置。當變更視窗執行時，每台裝置的最新政策版本會被提交至相關防火牆：</li><li>針對選定的裝置群組，政策會安裝至該群組所有相關聯的防火牆</li><li>針對選定的管理裝置（例如進階模式的 FortiManager 裝置），該 ADOM 的所有政策會安裝至與其相關聯的所有防火牆</li><li>針對選定的 CMA 裝置，其政策會安裝至每項政策相關聯的所有防火牆。</li></ul>", "p210": "<h3>變更視窗畫面</h3><p>變更視窗的畫面是什麼樣子？</p><p>在 SecureTrack 中，前往「監控 &gt; 變更視窗」即可存取現有的變更視窗，或建立新的視窗；使用「新增變更視窗」按鈕排程新的變更視窗，或使用變更視窗面板檢視摘要資訊、修改既有的變更視窗。</p>", "p211": "<h3>變更視窗設定畫面（一）</h3><p>本頁呈現「新增變更視窗」設定表單，可填寫標題、起訖時間、說明、日期、重複頻率與時區等基本資訊，並選擇此視窗要涵蓋的管理裝置或裝置群組。</p>", "p212": "<h3>變更視窗設定畫面（二）</h3><p>本頁延續前一頁的變更視窗設定表單，呈現裝置／裝置群組選擇區塊，管理者可於此勾選要納入此變更視窗的防火牆、安全群組或管理主控台裝置。</p>", "p213": "<h3>更新與刪除變更視窗</h3><p>更新與刪除：可針對先前看過的參數進行簡易更新，包括：</p><ul><li>標題</li><li>起訖時間</li><li>說明</li><li>日期</li><li>重複頻率</li><li>時區</li></ul><p>此外還可對以下項目進行變更：</p>", "p214": "<h3>變更視窗報告</h3><p>報告</p><p>變更視窗報告可讓您檢視執行中視窗的進度、下一個已排程視窗的詳細資訊，以及上一次視窗的執行結果。若要檢視上一次變更視窗的結果，點擊「上一個視窗」連結；提交狀態報告中顯示的詳細內容，會完全依廠牌回傳的原始結果呈現，包括狀態、警告、錯誤資料、重複的物件名稱等；重複的結果或非預期的名稱，可能是特定廠牌本身限制所致。</p>", "p215": "<h3>下一個排程視窗</h3><p>在「下一個視窗」區塊，可查看下一個已排程視窗的日期與時間；點擊「下一個視窗」連結，即可檢視該變更視窗的報告。報告內容包括變更視窗標題、預計開始日期與時間、相關廠牌與裝置名稱、狀態、警告與錯誤等資訊。</p><p>您還可以進一步深入檢視，比較最近一次與前一次修訂版本的差異；也可以使用專屬 API 查詢較舊的變更視窗報告。</p>", "p216": "<h3>筆記頁</h3><p>（本頁為學員筆記空白頁。）</p>", "p217": "<h3>實作練習</h3><p>第 18 堂課</p>", "p218": "<h3>認證測驗說明</h3><p>認證測驗說明：本測驗共 26 題，須完成 TCSE 2－TOS Aurora：SecureChange 課程後方可應試，並須以至少 80% 的成績通過方可完成本認證課程。</p>", "p219": "<h3>認證測驗題目（第 1-2 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 1-2 題，內容涉及 Designer 的主要功能與工作流程中「動態指派」的用途，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p220": "<h3>認證測驗題目（第 3-4 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 3-4 題，內容涉及在存取請求欄位新增目標時的可用選項，以及政策變更從管理裝置推送至子裝置的流程名稱，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p221": "<h3>認證測驗題目（第 5-6 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 5-6 題，內容涉及使用腳本化條件的時機，以及工作流程中請求者的角色，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p222": "<h3>認證測驗題目（第 7-8 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 7-8 題，內容涉及工作流程中風險分析執行的時機，以及多位使用者同時透過 Designer 更新同一裝置時的情況，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p223": "<h3>認證測驗題目（第 9-10 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 9-10 題，內容涉及自動取得工作流程步驟風險資訊的功能，以及政策變更是否須立即套用的是非題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p224": "<h3>認證測驗題目（第 11-12 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 11-12 題，內容涉及政策變更供應配置至管理裝置後的情況，以及建立工作流程的各種方式，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p225": "<h3>認證測驗題目（第 13-14 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 13-14 題，為實作練習題（實驗室任務 2），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p226": "<h3>認證測驗題目（第 15-16 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 15-16 題，為實作練習題（實驗室任務 3），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p227": "<h3>認證測驗題目（第 17-18 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 17-18 題，為實作練習題（實驗室任務 4、5），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p228": "<h3>認證測驗題目（第 19-20 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 19-20 題，為實作練習題（實驗室任務 5、6），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p229": "<h3>認證測驗題目（第 21-22 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 21-22 題，為實作練習題（實驗室任務 6、7），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p230": "<h3>認證測驗題目（第 23-24 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 23 題，為實作練習題（實驗室任務 8），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p231": "<h3>認證測驗題目（第 25-26 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 24-25 題，為實作練習題（實驗室任務 9、10），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p232": "<h3>認證測驗題目（第 27-28 題）</h3><p>本頁為 TCSE 2 線上認證測驗第 26 題，為實作練習題（實驗室任務 10），須完成操作後回答相關問題，請參閱左側原始畫面作答，此處不另行列出題目與選項內容。</p>", "p233": "<h3>課程結束</h3><p>感謝您完成 TCSE 2－TOS Aurora：SecureChange 認證課程，祝您順利通過認證考試。</p>"};
+
+  function safeHash(i){ try{ history.replaceState(null,'','#p'+i); }catch(e){} }
+
+  function activeModuleFor(i){
+    var page = pages[i];
+    return page ? page.getAttribute('data-module') : '0';
+  }
+
+  function syncTabs(i){
+    var mod = activeModuleFor(i);
+    tabButtons.forEach(function(b){
+      b.classList.toggle('active', b.dataset.module === mod);
+    });
+    var activeBtn = document.querySelector('.tab-btn.active');
+    if(activeBtn && activeBtn.scrollIntoView){
+      try{ activeBtn.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'}); }catch(e){}
+    }
+  }
+
+  function populateText(i){
+    var page = pages[i];
+    if(!page) return;
+    var key = page.getAttribute('data-textkey');
+    if(!key) return;
+    var tc = page.querySelector('.slide-text-col');
+    if(!tc) return;
+    if(tc.getAttribute('data-filled') === '1') return;
+    var html = TEXT_MAP[key];
+    if(html){
+      tc.innerHTML = html;
+      tc.setAttribute('data-filled', '1');
+    }
+  }
+
+  // ---------- Chapter read-aloud (Traditional Chinese text-to-speech) ----------
+  var synth = window.speechSynthesis || null;
+  var readState = 'stopped'; // 'stopped' | 'playing' | 'paused'
+  var pausedAtIndex = null;
+  var selectedVoice = null;   // SpeechSynthesisVoice
+  var selectedRate = 1.0;     // default reading speed
+  var voicesList = [];
+  var ttsKeepAliveTimer = null;
+  var ttsStartToken = 0;      // invalidates stale delayed speak() calls from a previous nav/stop
+
+  function pickDefaultVoice(){
+    if(!synth) return null;
+    var v = voicesList.find(function(x){ return /zh-TW/i.test(x.lang) && /Google/i.test(x.name); });
+    if(!v) v = voicesList.find(function(x){ return /zh-TW/i.test(x.lang) && (x.name.indexOf('國語') !== -1 || x.name.indexOf('台灣') !== -1); });
+    if(!v) v = voicesList.find(function(x){ return /zh-TW/i.test(x.lang); });
+    if(!v) v = voicesList.find(function(x){ return /zh-HK/i.test(x.lang); });
+    if(!v) v = voicesList.find(function(x){ return /zh/i.test(x.lang); });
+    return v || null;
+  }
+
+  function loadVoices(){
+    if(!synth) return;
+    voicesList = synth.getVoices() || [];
+    if(!selectedVoice) selectedVoice = pickDefaultVoice();
+  }
+  if(synth){
+    loadVoices();
+    if(synth.addEventListener) synth.addEventListener('voiceschanged', loadVoices);
+  }
+
+  function populateRateSelect(i){
+    var page = pages[i];
+    if(!page) return;
+    var sel = page.querySelector('.rate-select');
+    if(!sel) return;
+    if(sel.getAttribute('data-filled') === '1'){
+      sel.value = String(selectedRate);
+      return;
+    }
+    [['0.75','0.75x（較慢）'],['0.85','0.85x'],['1','1.0x（預設）'],['1.15','1.15x'],['1.3','1.3x（較快）']].forEach(function(pair){
+      var opt = document.createElement('option');
+      opt.value = pair[0];
+      opt.textContent = pair[1];
+      sel.appendChild(opt);
+    });
+    sel.value = String(selectedRate);
+    sel.setAttribute('data-filled', '1');
+    sel.addEventListener('change', function(){
+      selectedRate = parseFloat(sel.value) || 1.0;
+      document.querySelectorAll('.rate-select[data-filled="1"]').forEach(function(s2){
+        if(s2 !== sel) s2.value = sel.value;
+      });
+      if(readState === 'playing'){
+        speakIndex(current);
+      }
+    });
+  }
+
+  function getReadableText(i){
+    var page = pages[i];
+    if(!page) return '';
+    var col = page.querySelector('.slide-text-col');
+    if(!col) return '';
+    return (col.innerText || col.textContent || '').trim();
+  }
+
+  function updateReadButtons(){
+    document.querySelectorAll('.read-toggle-btn').forEach(function(b){
+      b.classList.remove('playing','paused');
+      var icon = '\u25B6', label = '朗讀本頁';
+      if(readState === 'playing'){ icon = '\u23F8'; label = '暫停朗讀'; b.classList.add('playing'); }
+      else if(readState === 'paused'){ icon = '\u25B6'; label = '繼續朗讀'; b.classList.add('paused'); }
+      b.innerHTML = '';
+      var iconSpan = document.createElement('span');
+      iconSpan.className = 'icon';
+      iconSpan.textContent = icon;
+      b.appendChild(iconSpan);
+      b.appendChild(document.createTextNode(' ' + label));
+    });
+  }
+
+  function clearKeepAlive(){
+    if(ttsKeepAliveTimer){ clearInterval(ttsKeepAliveTimer); ttsKeepAliveTimer = null; }
+  }
+  function startKeepAlive(){
+    clearKeepAlive();
+    ttsKeepAliveTimer = setInterval(function(){
+      if(synth && synth.speaking){
+        synth.pause();
+        synth.resume();
+      }
+    }, 9000);
+  }
+
+  function stopReading(){
+    ttsStartToken++;
+    clearKeepAlive();
+    readState = 'stopped';
+    pausedAtIndex = null;
+    if(synth){ try{ synth.cancel(); }catch(e){} }
+    updateReadButtons();
+  }
+
+  function speakIndex(i){
+    if(!synth || readState !== 'playing') return;
+    var page = pages[i];
+    if(!page){ stopReading(); return; }
+    var text = getReadableText(i);
+    ttsStartToken++;
+    var myToken = ttsStartToken;
+    clearKeepAlive();
+    try{ synth.cancel(); }catch(e){}
+    if(!text){ advanceReading(i); return; }
+    setTimeout(function(){
+      if(myToken !== ttsStartToken) return;
+      if(readState !== 'playing') return;
+      var utter = new SpeechSynthesisUtterance(text);
+      utter.lang = (selectedVoice && selectedVoice.lang) ? selectedVoice.lang : 'zh-TW';
+      if(selectedVoice) utter.voice = selectedVoice;
+      utter.rate = selectedRate;
+      utter.onstart = function(){ startKeepAlive(); };
+      utter.onend = function(){
+        clearKeepAlive();
+        if(readState === 'playing') advanceReading(i);
+      };
+      utter.onerror = function(){ clearKeepAlive(); };
+      synth.speak(utter);
+    }, 80);
+  }
+
+  function advanceReading(i){
+    var page = pages[i];
+    var nextPage = pages[i+1];
+    var curChapter = page ? page.getAttribute('data-chapter-id') : null;
+    if(nextPage && curChapter && nextPage.getAttribute('data-chapter-id') === curChapter){
+      show(i+1, true);
+      speakIndex(i+1);
+    } else {
+      stopReading();
+    }
+  }
+
+  function startReadingFrom(i){
+    if(!synth){ alert('您的瀏覽器不支援語音朗讀功能。'); return; }
+    readState = 'playing';
+    pausedAtIndex = null;
+    updateReadButtons();
+    speakIndex(i);
+  }
+
+  function pauseReading(){
+    if(readState !== 'playing') return;
+    readState = 'paused';
+    pausedAtIndex = current;
+    clearKeepAlive();
+    if(synth){ try{ synth.pause(); }catch(e){} }
+    updateReadButtons();
+  }
+
+  function resumeReading(){
+    if(readState !== 'paused') return;
+    readState = 'playing';
+    updateReadButtons();
+    if(pausedAtIndex === current && synth){
+      try{ synth.resume(); }catch(e){}
+      startKeepAlive();
+    } else {
+      speakIndex(current);
+    }
+  }
+
+  function toggleReadPlay(pageIdx){
+    if(readState === 'playing'){ pauseReading(); }
+    else if(readState === 'paused'){ resumeReading(); }
+    else { startReadingFrom(pageIdx); }
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest ? e.target.closest('.read-toggle-btn') : null;
+    if(!btn) return;
+    var pageEl = btn.closest('.page-view');
+    var idx = pageEl ? parseInt(pageEl.getAttribute('data-index'), 10) : current;
+    toggleReadPlay(idx);
+  });
+
+  function loadImagesFor(i){
+    if(i < 0 || i > total-1) return;
+    var page = pages[i];
+    if(!page) return;
+    var imgs = page.querySelectorAll('img.slide-img[data-src]');
+    imgs.forEach(function(img){
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
+    });
+  }
+
+  function show(i, fromReading){
+    try{
+      if(i < 0) i = 0;
+      if(i > total-1) i = total-1;
+      var wasPlaying = (!fromReading && readState === 'playing');
+      var wasPaused = (!fromReading && readState === 'paused');
+      if(pages[current]) pages[current].classList.remove('active');
+      current = i;
+      populateText(current);
+      populateRateSelect(current);
+      loadImagesFor(current);
+      loadImagesFor(current+1);
+      loadImagesFor(current-1);
+      pages[current].classList.add('active');
+      curIdxEl.textContent = current+1;
+      prevBtn.classList.toggle('disabled', current===0);
+      nextBtn.classList.toggle('disabled', current===total-1);
+      safeHash(current);
+      syncTabs(current);
+      if(wasPlaying){
+        speakIndex(current);
+      } else if(wasPaused){
+        clearKeepAlive();
+        if(synth){ try{ synth.cancel(); }catch(e){} }
+      }
+      updateReadButtons();
+      var tc = pages[current].querySelector('.slide-text-col');
+      if(tc) tc.scrollTop = 0;
+    }catch(err){
+      try{ console.error('show() failed at index', i, err); }catch(e2){}
+    }
+  }
+
+  prevBtn.addEventListener('click', function(){ show(current-1); });
+  nextBtn.addEventListener('click', function(){ show(current+1); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ show(current+1); }
+    else if(e.key === 'ArrowLeft'){ show(current-1); }
+  });
+
+  tabButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mod = btn.dataset.module;
+      if(moduleFirstIndex.hasOwnProperty(mod)){
+        show(moduleFirstIndex[mod]);
+      }
+    });
+  });
+
+  try{
+    var h = location.hash ? location.hash.substring(1) : '';
+    var m = h.match(/^p(\d+)$/);
+    if(m){ show(parseInt(m[1],10)); } else { show(0); }
+  }catch(e){ show(0); }
+
+  // ---------- Tab bar drag / scroll ----------
+  var tabScroll = document.getElementById('tabScroll');
+  document.getElementById('arrowLeft').addEventListener('click', function(){
+    tabScroll.scrollBy({left:-220, behavior:'smooth'});
+  });
+  document.getElementById('arrowRight').addEventListener('click', function(){
+    tabScroll.scrollBy({left:220, behavior:'smooth'});
+  });
+
+  var isDown = false, startX, scrollLeft;
+  tabScroll.addEventListener('mousedown', function(e){
+    isDown = true; tabScroll.classList.add('dragging');
+    startX = e.pageX - tabScroll.offsetLeft;
+    scrollLeft = tabScroll.scrollLeft;
+  });
+  ['mouseleave','mouseup'].forEach(function(evt){
+    tabScroll.addEventListener(evt, function(){ isDown=false; tabScroll.classList.remove('dragging'); });
+  });
+  tabScroll.addEventListener('mousemove', function(e){
+    if(!isDown) return;
+    e.preventDefault();
+    var x = e.pageX - tabScroll.offsetLeft;
+    var walk = (x - startX);
+    tabScroll.scrollLeft = scrollLeft - walk;
+  });
+  tabScroll.addEventListener('wheel', function(e){
+    if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+      tabScroll.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  }, {passive:false});
+  var touchStartX = 0, touchScrollLeft = 0;
+  tabScroll.addEventListener('touchstart', function(e){
+    touchStartX = e.touches[0].pageX; touchScrollLeft = tabScroll.scrollLeft;
+  }, {passive:true});
+  tabScroll.addEventListener('touchmove', function(e){
+    var dx = e.touches[0].pageX - touchStartX;
+    tabScroll.scrollLeft = touchScrollLeft - dx;
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
